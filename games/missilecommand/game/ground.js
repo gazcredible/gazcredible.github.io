@@ -249,7 +249,7 @@ class Ground extends GameObject
             //GAZCanvas.Line(new Vector2(r.x,r.y),new Vector2(r.x+8,r.y),'#00ff00',1);
             //GAZCanvas.Line(new Vector2(r.x+8,r.y), new Vector2((i+1)*8,768 - (this.data[i+1]*8) ),'#00ff00',1);
 
-            this.fenceCollider.draw('#ff0000');
+            //this.fenceCollider.draw('#ff0000');
         }
         
         GAZCanvas.Text(24,this.no_of_lines+": "+this.data[this.no_of_lines], new Vector2(100,100),"#ffffff","left");
