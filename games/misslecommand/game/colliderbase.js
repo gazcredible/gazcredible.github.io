@@ -10,53 +10,54 @@ class ColliderBase
     
     init()
     {
-        worldPointList = [];
-        localPointList = [];
-        lineList = [];
+        this.worldPointList = [];
+        this.localPointList = [];
+        this.lineList = [];
     }
     
     setTransform(mat)
     {
-        lineList = [];
+        this.lineList = [];
+
+        this.worldPointList= [];
         
-        worldPointList= [];
-        
-        for(let i = 0;i< localPointList.length;i+=2)
+        for(let i = 0;i< this.localPointList.length-1;i+=2)
         {
-            var v0 = localPointList[i];
-            var v1 = localPointList[i+1];
+            var v0 = this.localPointList[i];
+            var v1 = this.localPointList[i+1];
             
-            v0 = mat.Transform(v0);
-            v1 = mat.Transform(v1);
+            v0 = mat.TransformVector2(v0);
+            v1 = mat.TransformVector2(v1);
             
             var line = new ParametricLine();
             line.init(v0,v1);
-            lineList.push(line);
-            
-            worldPointList.push(v0);
-            worldPointList.push(v1);
+            this.lineList.push(line);
+
+            this.worldPointList.push(v0);
+            this.worldPointList.push(v1);
         }
     }
 
     collides(obj, collisionList)
     {
         var bGotCollision = false;
-    
-        if (obj.GetType() == typeof(ManifoldCollider))
+
+        //console.log(obj.constructor.name );
+
+        if (obj.constructor.name == ManifoldCollider.constructor.name)
         {
             return obj.Collides(this, collisionList);
         }
         else
         {
-            var result = new Vector2();
+            var result = new Vector2(-1,-1);
             
             for (let isrc = 0; isrc < obj.lineList.length; isrc++)
             {
-                for (let idst = 0; idst < lineList.length; idst++)
+                for (let idst = 0; idst < this.lineList.length; idst++)
                 {
                     
-                
-                    if (obj.lineList[isrc].GetIntercept(lineList[idst], result))
+                    if (obj.lineList[isrc].getIntercept(this.lineList[idst], result))
                     {
                         if (collisionList == null)
                         {
@@ -76,16 +77,16 @@ class ColliderBase
     isPointInMe(pos)
     {
         var i = 0;
-        var j = worldPointList.length - 1;
+        var j = this.worldPointList.length - 1;
         var oddNodes = false;
     
-        for (i = 0; i < worldPointList.length; i++)
+        for (i = 0; i < this.worldPointList.length; i++)
         {
-            if ((worldPointList[i].y < pos.y && worldPointList[j].y >= pos.y)
-                || (worldPointList[j].y < pos.y && worldPointList[i].y >= pos.y)
+            if ((this.worldPointList[i].y < pos.y && this.worldPointList[j].y >= pos.y)
+                || (this.worldPointList[j].y < pos.y && this.worldPointList[i].y >= pos.y)
             )
             {
-                if (worldPointList[i].x + (pos.y - worldPointList[i].y) / (worldPointList[j].y - worldPointList[i].y) * (worldPointList[j].x - worldPointList[i].x) < pos.x)
+                if (this.worldPointList[i].x + (pos.y - this.worldPointList[i].y) / (this.worldPointList[j].y - this.worldPointList[i].y) * (this.worldPointList[j].x - this.worldPointList[i].x) < pos.x)
                 {
                     oddNodes = !oddNodes;
                 }
@@ -98,14 +99,14 @@ class ColliderBase
 
     draw(col)
     {
-        if (worldPointList.Count == 0) return;
+        if (this.worldPointList.Count == 0) return;
     
-        for(let i = 0;i< localPointList.length;i+=2)
+        for(let i = 0;i< this.localPointList.length;i+=2)
         {
-            var v0 = worldPointList[i];
-            var v1 = worldPointList[i+1];
-        
-            //DebugDraw.Get().Line2D(v0,v1,col);
+            var v0 = this.worldPointList[i];
+            var v1 = this.worldPointList[i+1];
+
+            GAZCanvas.Line(v0,v1,col,1);
         }
     }
 }

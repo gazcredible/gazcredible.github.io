@@ -86,6 +86,21 @@ class GameState_Attract extends StateMachineState
         super.draw()
     
         GameInst.draw();
+
+        var line0 = new LineCollider();
+        line0.initFromPoints(new Vector2(0,0),new Vector2(1024,768));
+        var line1 = new LineCollider();
+        line1.initFromPoints(new Vector2(0,768),new Vector2(1024,0));
+
+        line0.draw('#ff0000');
+        line1.draw('#ff0000');
+
+        var colliders = [];
+        if(line0.collides(line1,colliders) == true)
+        {
+            GAZCanvas.Rect(new Rect(colliders[0].x-2, colliders[0].y-2,4,4),'#ffffff',true,1);
+        }
+
         
         /*
         if (Library.DebugDraw.Get().effect != null)

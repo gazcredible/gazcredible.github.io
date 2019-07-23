@@ -10,37 +10,38 @@ class ParametricLine
     
     init(start, end)
     {
-        x0 = start.x;
-        y0 = start.y;
-        
-        x1 = end.x;
-        y1 = end.y;
+        this.x0 = start.x;
+        this.y0 = start.y;
+
+        this.x1 = end.x;
+        this.y1 = end.y;
     }
 
     getIntercept(line, intercept)
     {
-        intercept = new Vector2(0, 0);
-        
-        var a = x0;
-        var c = x1 - x0;
+        intercept.x = 0;
+        intercept.y = 0;
+
+        var a = this.x0;
+        var c = this.x1 - this.x0;
         var d = line.x0;
         var f = line.x1 - line.x0;
-        var g = y0;
-        var h = y1 - y0;
+        var g = this.y0;
+        var h = this.y1 - this.y0;
         var i = line.y0;
         var j = line.y1 - line.y0;
         var k = ((j * c) - (f * h));
         
-        if(Math.Abs(k) < 0.001)	return false;
+        if(Math.abs(k) < 0.001)	return false;
         
         var t = ((j * (d - a)) + (f * (g - i))) / k;
         
         if (t > 1 || t < 0) return false;
         
-        intercept.x = x0 + t * (x1 - x0);
-        intercept.y = y0 + t * (y1 - y0);
+        intercept.x = this.x0 + t * (this.x1 - this.x0);
+        intercept.y = this.y0 + t * (this.y1 - this.y0);
         
-        if (Math.Abs(line.x1 - line.x0) > 0)
+        if (Math.abs(line.x1 - line.x0) > 0)
         {
             t = (intercept.x - line.x0) / (line.x1 - line.x0);
         }

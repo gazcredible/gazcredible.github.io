@@ -196,3 +196,5 @@ class Matrix
         return m;
     }
 }
+
+Matrix_Identity = new Matrix();
