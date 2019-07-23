@@ -161,14 +161,28 @@ class Ground extends GameObject
         this.data.push(10);
         this.data.push(10);
         this.data.push(9);
-        
-        
-        
-        
-    
+
+        this.no_of_lines = this.data.length;
+
+        this.fenceCollider = new FenceCollider();
+
+        let fenceSourcePoints = [];
+
+        for(let i=0;i<this.no_of_lines;i++)
+        {
+            var r = new Rect();
+            r.x = i*8;
+            r.y = 768 - (this.data[i]*8);
+            r.w = 9;
+            r.h = 768 - r.y;
+            fenceSourcePoints.push(new Vector2(r.x,r.y));
+            fenceSourcePoints.push(new Vector2(r.x+8,r.y));
+        }
+
+        this.fenceCollider.initFromFence(fenceSourcePoints);
+
         this.rand = new Random();
         this.rand.init(1234);
-        this.no_of_lines = this.data.length;
     }
     
     init()
@@ -215,7 +229,7 @@ class Ground extends GameObject
         
         super.draw();
         Canvas.ctx().imageSmoothingEnabled = false;
-        GAZCanvas.Sprite(this.image, new Rect(0,0,256,256));
+        GAZCanvas.Sprite(this.image, new Rect(500,0,256,256));
     
     
         Canvas.ctx().imageSmoothingEnabled = true;
@@ -231,6 +245,11 @@ class Ground extends GameObject
            // GAZCanvas.Rect(r,this.getRandomColor(),true,1);
            //GAZCanvas.Rect(r,'#ffff00',false,0);
             GAZCanvas.Rect(r,'#ffff00',true,1);
+
+            //GAZCanvas.Line(new Vector2(r.x,r.y),new Vector2(r.x+8,r.y),'#00ff00',1);
+            //GAZCanvas.Line(new Vector2(r.x+8,r.y), new Vector2((i+1)*8,768 - (this.data[i+1]*8) ),'#00ff00',1);
+
+            this.fenceCollider.draw('#ff0000');
         }
         
         GAZCanvas.Text(24,this.no_of_lines+": "+this.data[this.no_of_lines], new Vector2(100,100),"#ffffff","left");

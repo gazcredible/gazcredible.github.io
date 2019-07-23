@@ -59,12 +59,26 @@ class GameState_Attract extends StateMachineState
     constructor()
     {
         super();
+
+        this.line0 = new LineCollider();
+        this.line0.initFromPoints(new Vector2(-1024,0),new Vector2(1024,0));
+        this.line1 = new LineCollider();
+        this.line1.initFromPoints(new Vector2(-1024,0),new Vector2(1024,0));
+
+        this.angle = 0;
+        this.speed = ((0.05) * Math.PI)/180.0;
     }
     
     
     init()
     {
         //MCGame.Get().OnStartANewGame();
+    }
+
+
+    DEG2RAD(a)
+    {
+        return (a*Math.PI)/180.0;
     }
     
     update()
@@ -79,6 +93,14 @@ class GameState_Attract extends StateMachineState
         {
             GameInst.update();
         }
+
+        this.angle += this.speed;
+
+        var mat = Matrix.Multiply(Matrix.CreateRotationZ(this.angle) , Matrix.CreateTranslation(512,768/2) );
+        this.line0.setTransform(mat);
+
+        var mat = Matrix.Multiply(Matrix.CreateRotationZ(this.angle + this.DEG2RAD(90) ) , Matrix.CreateTranslation(512,768/2));
+        this.line1.setTransform(mat);
     }
     
     draw()
@@ -87,19 +109,20 @@ class GameState_Attract extends StateMachineState
     
         GameInst.draw();
 
-        var line0 = new LineCollider();
-        line0.initFromPoints(new Vector2(0,0),new Vector2(1024,768));
-        var line1 = new LineCollider();
-        line1.initFromPoints(new Vector2(0,768),new Vector2(1024,0));
-
-        line0.draw('#ff0000');
-        line1.draw('#ff0000');
+        this.line0.draw('#ff0000');
+        this.line1.draw('#ff0000');
 
         var colliders = [];
-        if(line0.collides(line1,colliders) == true)
+        this.line0.collides(this.line1,colliders);
+
+        GameInst.ground.fenceCollider.collides(this.line0,colliders);
+        GameInst.ground.fenceCollider.collides(this.line1,colliders);
+
+        for(let i=0;i<colliders.length;i++)
         {
-            GAZCanvas.Rect(new Rect(colliders[0].x-2, colliders[0].y-2,4,4),'#ffffff',true,1);
+            GAZCanvas.Rect(new Rect(colliders[i].x-2, colliders[i].y-2,4,4),'#ffffff',true,1);
         }
+
 
         
         /*

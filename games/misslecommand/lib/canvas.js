@@ -15,13 +15,18 @@ class baseCanvas
      */
     constructor()
     {
+        this.context = 0;
     }
     
     // ctx() - return the 2D canvas context
     ctx()
     {
-        var canvas = document.getElementById("canvas");
-        return canvas.getContext("2d");
+        if(this.context == 0) {
+            var canvas = document.getElementById("canvas");
+            this.context = canvas.getContext("2d");
+        }
+
+        return this.context;
     }
 
     /*

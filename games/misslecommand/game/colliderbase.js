@@ -64,7 +64,7 @@ class ColliderBase
                             return true;
                         }
                     
-                        collisionList.push(result);
+                        collisionList.push(new Vector2(result.x,result.y));
                     
                         bGotCollision = true;
                     }

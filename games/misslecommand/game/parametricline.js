@@ -19,6 +19,12 @@ class ParametricLine
 
     getIntercept(line, intercept)
     {
+        if ((line.x0 < Math.min(this.x0,this.x1)) && (line.x1 < Math.min(this.x0,this.x1))) return false;
+        if ((line.x0 > Math.max(this.x0, this.x1)) && (line.x1 > Math.max(this.x0, this.x1))) return false;
+
+        if ((line.y0 < Math.min(this.y0, this.y1)) && (line.y1 < Math.min(this.y0, this.y1))) return false;
+        if ((line.y0 > Math.max(this.y0, this.y1)) && (line.y1 > Math.max(this.y0, this.y1))) return false;
+
         intercept.x = 0;
         intercept.y = 0;
 
