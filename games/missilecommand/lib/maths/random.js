@@ -1,9 +1,11 @@
 class Random
 {
-    constructor()
+    constructor(value)
     {
        this.seed = 0;
        this.currentValue = 0;
+
+        this.init(value);
     }
     
     init(value)

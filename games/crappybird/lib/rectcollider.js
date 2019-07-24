@@ -1,7 +1,8 @@
-/*
 class RectCollider extends Rect
 {
-    //   RectCollider - AABB 2D rectangle
+    /*
+        RectCollider - AABB 2D rectangle
+     */
     constructor()
     {
         super();
@@ -12,8 +13,12 @@ class RectCollider extends Rect
         this.x = position.x;
         this.y = position.y;
     }
-
-    //    collides(RectCollider collider)
+    
+    /*
+        collides(RectCollider collider)
+        
+        Does this collide with RectCollider?
+    */
     collides(collider)
     {
         if (this.x >= (collider.x + collider.w)) return false;
@@ -23,4 +28,4 @@ class RectCollider extends Rect
     
         return true;
     }
-}*/
+}

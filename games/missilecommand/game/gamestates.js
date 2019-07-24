@@ -72,7 +72,7 @@ class GameState_Attract extends StateMachineState
     
     init()
     {
-        //MCGame.Get().OnStartANewGame();
+        GameInst.onStartNewGame();
     }
 
 
@@ -115,14 +115,18 @@ class GameState_Attract extends StateMachineState
         var colliders = [];
         this.line0.collides(this.line1,colliders);
 
-        GameInst.ground.fenceCollider.collides(this.line0,colliders);
-        GameInst.ground.fenceCollider.collides(this.line1,colliders);
+        GameInst.ground.collider.collides(this.line0,colliders);
+        GameInst.ground.collider.collides(this.line1,colliders);
 
         for(let i=0;i<colliders.length;i++)
         {
             GAZCanvas.Rect(new Rect(colliders[i].x-2, colliders[i].y-2,4,4),'#ffffff',true,1);
         }
 
+
+        debugFont.setScale(10.0);
+        debugFont.print(new Vector2(1024/ 2, 768 / 3), "MISSILE\nCOMMAND", 'centre');
+        debugFont.setScale(1.0);
 
         
         /*

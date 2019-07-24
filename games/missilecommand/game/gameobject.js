@@ -1,10 +1,14 @@
-class GameObject extends ColliderBase
+class GameObject
 {
     constructor()
     {
-        super();
-        this.active = false;
+        this.collider = 0;
+        this.active = true;
         this.velocity = new Vector2();
+        this.position = new Vector2();
+        this.oldPosition = new Vector2();
+
+        this.drawCollisions = false;
     }
     
     /*
@@ -12,9 +16,19 @@ class GameObject extends ColliderBase
         I could add throw 'Undefined function' as the implementation for these functions if I wanted
         to ensure that they would have real implementations in the derived classes
      */
-    init()
+    onOneTimeInit()
     {
     
+    }
+
+    onLevelStart(valid)
+    {
+
+    }
+
+    onExplode()
+    {
+        this.active = false;
     }
     
     update()

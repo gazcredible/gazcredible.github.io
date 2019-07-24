@@ -3,19 +3,35 @@ class mcgame
 {
     constructor()
     {
+        this.inputEventManager = 0;
+
         this.frameCount = 0;
         this.stateMachine = new StateMachine();
         this.score = 0;
         
         this.ground = new Ground();
-        this.ground.init();
+
+        this.player = new PlayerObject();
+        this.cities = [];
+        this.silos = [];
+
+        this.baddieMissileList = [];
+        this.playerMissileList =[];
+        this.explosionList = [];
+
+
+        this.levelManager = new LevelManager();
     }
     
     oneTimeInit()
     {
+        this.inputEventManager = new MCInputEventManager ();
+
         GAZCanvas.referenceScreenSize = new Size(1024,768);
         
         //create assets
+        this.ground.onOneTimeInit();
+        this.levelManager.onOneTimeInit();
         
         this.stateMachine.addState(GameState_Test.label(), new GameState_Test());
         
@@ -29,6 +45,45 @@ class mcgame
         */
     
         this.stateMachine.setState(GameState_Attract.label());
+
+        this.onStartNewGame();
+    }
+
+    onStartNewGame()
+    {
+        let cityLocations  =
+        [
+            new Vector2(156,699),
+            new Vector2(261,707),
+            new Vector2(356,707),
+    
+            new Vector2(590,699),
+            new Vector2(698,698),
+            new Vector2(812,707),
+        ];
+
+        this.cities = [];
+
+        for(let i=0;i<cityLocations.length;i++)
+        {
+            this.cities.push(new City(cityLocations[i],true));
+        }
+
+        let siloLocations =
+        [
+            new Vector2(90, 685),
+            new Vector2(500, 685),
+            new Vector2(960, 685),
+        ];
+
+        this.silos = [];
+
+        for(let i=0;i<siloLocations.length;i++)
+        {
+            this.silos.push(new silo(siloLocations[i]));
+        }
+
+        this.levelManager.onStartNewGame();
     }
 
     update()
@@ -41,6 +96,30 @@ class mcgame
         
         this.ground.draw();
     }
+
+    getActiveCityCount()
+    {
+        var count = 0
+        for(let i=0;i<this.cities.length;i++)
+        {
+            if(this.cities[i].active == true)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    addPlayerMissile(position,target)
+    {
+        this.playerMissileList.push(new PlayerMissile(position,target));
+    }
+
+    addBaddieMissile(position,target,speed)
+    {
+        this.baddieMissileList.push(new BaddieMissile(position,target, speed) );
+    }
     
     Run()
     {
@@ -50,20 +129,24 @@ class mcgame
         
         setInterval(function()
         {
-            //on each frame ...
-            
-            /*
-                GAZCanvas.update() -    this does the reactive canvas functionality
-                                        and needs to be called at the beginning of each
-                                        update()
-             */
             GAZCanvas.update();
-            
-            /*
-                Input.update() -    Update system inputs (mouse, keyboard).
-                                    Needs to be called each frame
-             */
+
             Input.update();
+            GameInst.inputEventManager.processInput();
+
+            GameInst.levelManager.update();
+
+            for(let i=0;i<GameInst.baddieMissileList.length;i++)
+            {
+                GameInst.baddieMissileList[i].update();
+
+                let collisions = [];
+
+                if(GameInst.ground.collider.collides(GameInst.baddieMissileList[i].collider,collisions) == true)
+                {
+                    GameInst.baddieMissileList[i].active = false;
+                }
+            }
             
             GameInst.frameCount+= 1;
             
@@ -76,6 +159,22 @@ class mcgame
     
             //do state machine draw
             GameInst.stateMachine.draw();
+
+            for(let i=0;i<GameInst.baddieMissileList.length;i++)
+            {
+                GameInst.baddieMissileList[i].draw('#ff0000');
+            }
+
+            for(let i=0;i<GameInst.silos.length;i++)
+            {
+                GameInst.silos[i].draw();
+            }
+
+            for(let i=0;i<GameInst.cities.length;i++)
+            {
+                GameInst.cities[i].draw();
+            }
+
     
             //draw the letterbox over the screen to hide any overdraw
             GAZCanvas.drawLetterbox(letterboxColour);

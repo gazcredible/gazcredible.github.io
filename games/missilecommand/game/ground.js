@@ -164,8 +164,6 @@ class Ground extends GameObject
 
         this.no_of_lines = this.data.length;
 
-        this.fenceCollider = new FenceCollider();
-
         let fenceSourcePoints = [];
 
         for(let i=0;i<this.no_of_lines;i++)
@@ -179,15 +177,22 @@ class Ground extends GameObject
             fenceSourcePoints.push(new Vector2(r.x+8,r.y));
         }
 
-        this.fenceCollider.initFromFence(fenceSourcePoints);
+        /*
+        fenceSourcePoints = [];
+        fenceSourcePoints.push(new Vector2(0,500));
+        fenceSourcePoints.push(new Vector2(1024,500));
+*/
+
+        this.collider = new FenceCollider();
+        this.collider.initFromFence(fenceSourcePoints);
 
         this.rand = new Random();
         this.rand.init(1234);
     }
     
-    init()
+    onOneTimeInit()
     {
-        super.init();
+        super.onOneTimeInit();
     }
     
     update()
@@ -204,14 +209,7 @@ class Ground extends GameObject
             this.no_of_lines++;
         }
     }
-    
-    
-    random()
-    {
-        var x = Math.sin(this.seed++) * 10000;
-        return x - Math.floor(x);
-    }
-    
+
     getRandomColor()
     {
         var letters = '0123456789ABCDEF';
@@ -220,7 +218,8 @@ class Ground extends GameObject
         {
             color += letters[this.rand.getInt(0,letters.length) ];
         }
-    return color;
+
+        return color;
     }
     
     draw()
@@ -228,11 +227,7 @@ class Ground extends GameObject
         this.update();
         
         super.draw();
-        Canvas.ctx().imageSmoothingEnabled = false;
-        GAZCanvas.Sprite(this.image, new Rect(500,0,256,256));
-    
-    
-        Canvas.ctx().imageSmoothingEnabled = true;
+
         this.rand.reset();
         for(let i=0;i<this.no_of_lines;i++)
         {
@@ -249,7 +244,7 @@ class Ground extends GameObject
             //GAZCanvas.Line(new Vector2(r.x,r.y),new Vector2(r.x+8,r.y),'#00ff00',1);
             //GAZCanvas.Line(new Vector2(r.x+8,r.y), new Vector2((i+1)*8,768 - (this.data[i+1]*8) ),'#00ff00',1);
 
-            //this.fenceCollider.draw('#ff0000');
+            //this.collider.draw('#ff0000');
         }
         
         GAZCanvas.Text(24,this.no_of_lines+": "+this.data[this.no_of_lines], new Vector2(100,100),"#ffffff","left");
