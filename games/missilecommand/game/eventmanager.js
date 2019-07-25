@@ -53,13 +53,21 @@ class MCInputEventManager extends InputEventManager
             this.inputEventList["MENU_SELECT"] = new InputValue();
         }
 
-        if(Input.currentMouseState == INPUT_PRESSED)
+        if(Input.getKeystate(KEYCODE_space_bar) == INPUT_PRESSED)
         {
-            this.inputEventList["LAUNCH"] = new InputValue();
+            this.inputEventList["START_GAME"] = new InputValue();
         }
-        else
+
+        if(Input.mouseLogicalPos != undefined)
         {
-           this.inputEventList["CURSOR"] = new ValueVector2(Input.mouseLogicalPos);
+            if (Input.currentMouseState == INPUT_PRESSED)
+            {
+                this.inputEventList["LAUNCH"] = new InputValue();
+            }
+            else
+            {
+                this.inputEventList["CURSOR"] = new ValueVector2(Input.mouseLogicalPos);
+            }
         }
     }
 }

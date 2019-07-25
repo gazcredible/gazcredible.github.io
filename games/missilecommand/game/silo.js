@@ -57,7 +57,7 @@ class silo extends GameObject
 
             for(let i=0;i<this.missileCount;i++)
             {
-                //MCGame.Get().drawingManager.DrawMissile(pos[i] + Position);
+                GameInst.drawMissile(pos[i] + this.position);
             }
         }
 

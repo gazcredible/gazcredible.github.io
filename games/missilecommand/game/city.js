@@ -30,30 +30,11 @@ class City extends GameObject
                 super.Draw();
             }
 
-            let rects =
-            [
-                new Rect(0,6,6,15),
-                new Rect(12,3,13,18),
-                new Rect(3,14,12,7),
-                new Rect(33,0,10,21),
-                new Rect(23,+11,12,10),
-                new Rect(42,+14,8,7),
-            ];
-
-            let main = '#ff3377';
-            let secondary = '#00ffff';
-
-            let cols =
-            [
-                main,main,secondary,main,secondary,secondary
-            ];
-
-            for (let i = 0; i < rects.length; i++)
-            {
-                GAZCanvas.Rect(new Rect(rects[i].x + this.position.x, rects[i].y+this.position.y, rects[i].w, rects[i].h), cols[i],true,1);
-            }
+            GameInst.drawCity(this.position);
         }
     }
+
+
 
     static width()
     {

@@ -14,12 +14,12 @@ class PlayerObject extends GameObject
     }
     update()
     {
-        this.oldthis.position = this.position;
+        this.oldposition = this.position;
 
-        if (GameInst.inputEventManager.EventOccured("CURSOR") == true)
+        if (GameInst.inputEventManager.eventOccured("CURSOR") == true)
         {
 
-            let delta = GameInst.inputEventManager.GetVal("CURSOR").value;
+            let delta = GameInst.inputEventManager.getVal("CURSOR").value;
 
             if (((delta.x + this.position.x) > 0+5) && ((delta.x + this.position.x) < 0- 5))
             {
@@ -54,16 +54,16 @@ class PlayerObject extends GameObject
             }
         }
 
-        if (GameInst.inputEventManager.EventOccured("TOUCH") == true)
+        if (GameInst.inputEventManager.eventOccured("TOUCH") == true)
         {
-            this.position = GameInst.inputEventManager.GetVal("TOUCH").value;
+            this.position = GameInst.inputEventManager.getVal("TOUCH").value;
         }
 
-        if (GameInst.inputEventManager.EventOccured("LAUNCH") == true)
+        if (GameInst.inputEventManager.eventOccured("LAUNCH") == true)
         {
             var launchPos = this.position; // use current this.position ;)
 
-            if (((launchPos - this.lastLaunchPos).Length() > 10) || ((GameInst.LogicTick - this.lastLaunch) > 40))
+            if (((launchPos - this.lastLaunchPos).length() > 10) || ((GameInst.lo - this.lastLaunch) > 40))
             {
                 this.lastLaunch = GameInst.LogicTick;
                 this.lastLaunchPos = this.position;
@@ -96,6 +96,6 @@ class PlayerObject extends GameObject
 
     draw()
     {
-        //GameInst.DrawMarker(this.position,new Colour(1,1,1));
+        GameInst.drawPlayerMarker(this.position,'#ffffff');
     }
 };

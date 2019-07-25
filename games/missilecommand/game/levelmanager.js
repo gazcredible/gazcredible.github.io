@@ -296,7 +296,7 @@ class LevelManager
 
     startLevel()
     {
-        if(IsCurrentLevelComplete() == true)
+        if(this.isCurrentLevelComplete() == true)
         {
             this.levelIndex++;
 
@@ -306,7 +306,7 @@ class LevelManager
             }
         }
 
-        this.levelList[this.levelIndex].startLevel();
+        this.levelList[this.levelIndex].startlevel();
     }
 
     isCurrentLevelComplete()

@@ -63,7 +63,7 @@ class BaddieMissile extends MissileBase
 {
     draw()
     {
-        super.draw('#ff0000');//MCGame.Get().GetBaddieColour());
+        super.draw(GameInst.getBaddieColour());
     }
 }
 
