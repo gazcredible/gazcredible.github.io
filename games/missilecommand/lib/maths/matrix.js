@@ -80,6 +80,11 @@ class Matrix
 
     TransformVector2(v0)
     {
+        if ((v0 == undefined) || (v0.x == undefined))
+        {
+            var a = 0;
+        }
+
         var result = new Vector2();
 
         result.x = (v0.x * this.m[0]) + (v0.y * this.m[4]) + this.m[12];

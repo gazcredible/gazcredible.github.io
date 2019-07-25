@@ -65,6 +65,8 @@ class GameState_Attract extends StateMachineState
     init()
     {
         GameInst.onStartNewGame();
+        GameInst.displayPlayer = false;
+        GameInst.displayScore = false;
     }
 
 
@@ -118,6 +120,9 @@ class GameState_StartGame extends StateMachineState
     {
         super.init()
         GameInst.onStartNewGame();
+
+        GameInst.displayPlayer = false;
+        GameInst.displayScore = true;
     }
     
     update()
@@ -208,6 +213,9 @@ class GameState_Wave extends StateMachineState
     {
         super.init()
         GameInst.disableMissileLaunch = false;
+
+        GameInst.displayPlayer = true;
+        GameInst.displayScore = true;
     }
     
     update()
@@ -215,7 +223,7 @@ class GameState_Wave extends StateMachineState
         super.update();
         GameInst.onUpdateGame();
         
-        if(GameInst.hasWaveFinished() == true)
+        if(GameInst.waveEnded == true)
         {
             GameInst.stateMachine.setState(GameState_PostWave.label() );
         }
@@ -275,23 +283,26 @@ class GameState_PostWave extends StateMachineState
         
         for(let i=0;i<GameInst.cities.length;i++)
         {
-            this.cityCount += GameInst.cities[i].valid?1:0;
+            this.cityCount += GameInst.cities[i].active?1:0;
         }
         
         this.tickRate = 5;
         
         GameInst.disableEmptySiloText = true;
+
+        GameInst.displayPlayer = false;
+        GameInst.displayScore = true;
     }
     
     update()
     {
         super.update();
 
-        if((GameInst.frameCount > tickRate) && (GameInst.frameCount>0))
+        if((GameInst.frameCount > this.tickRate) && (GameInst.frameCount>0))
         {
             GameInst.frameCount = 0;
             
-            switch(GameInst.currentState)
+            switch(this.currentState)
             {
                 case 'Stage.CountMissles':
                 {
@@ -309,7 +320,7 @@ class GameState_PostWave extends StateMachineState
                     {
                         this.currentState = 'Stage.CountCities';
                         this.tickRate = 20;
-                        GameInst.playerStats.score += GameInst.missileBonus;
+                        GameInst.playerStats.score += this.missileBonus;
                     }
                 }
                     break;
@@ -323,7 +334,7 @@ class GameState_PostWave extends StateMachineState
                         this.cityCount--;
                         
                         //GameAudio.Get().PlayCityPostWave();
-                        GameInst.removeCitiesForPosWave();
+                        GameInst.removeCityForPostWave();
                     }
                     else
                     {
@@ -358,13 +369,12 @@ class GameState_PostWave extends StateMachineState
         let y = 130;
         
         GameInst.onDrawGame();
-        
-        
+
         debugFont.setScale(3);
-        GameInst.print(new Vector2(x+282,y+10),"BONUS POINTS");
-        
-        GameInst.print(new Vector2(x + 40, y + 110), missileBonus);
-        GameInst.print(new Vector2(x + 40, y + 210), cityBonus);
+        debugFont.print(new Vector2(x+282,y+10),"BONUS POINTS",'centre');
+
+        debugFont.print(new Vector2(x + 40, y + 110), this.missileBonus.toString(),'right');
+        debugFont.print(new Vector2(x + 40, y + 210), this.cityBonus.toString(),'right');
         
         for(let i=0;i<this.displayMissles;i++)
         {
@@ -398,6 +408,8 @@ class GameState_GameOver extends StateMachineState
     init()
     {
         super.init()
+        GameInst.displayPlayer = false;
+        GameInst.displayScore = true;
     }
     
     update()

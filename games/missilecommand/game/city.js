@@ -1,12 +1,12 @@
 class City extends GameObject
 {
-    constructor(Location,valid)
+    constructor(Location,active)
     {
         super();
 
         this.position = Location;
 
-        this.active = valid;
+        this.active = active;
 
         if(this.active == true)
         {
@@ -18,18 +18,15 @@ class City extends GameObject
     onExplode()
     {
         //GameAudio.Get().ExplodeObject(this);
-        super.OnExplode();
+        super.onExplode();
     }
 
     draw()
     {
+        super.draw();
+
         if(this.active == true)
         {
-            if(this.drawCollisions == true)
-            {
-                super.Draw();
-            }
-
             GameInst.drawCity(this.position);
         }
     }

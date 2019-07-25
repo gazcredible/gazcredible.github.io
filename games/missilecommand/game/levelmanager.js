@@ -94,7 +94,8 @@ class LaunchMissileCommand extends Command
             start.x = 50 + Command.rand.getInt(0,900);
             start.y = 20;
 
-            if(Command.rand.getInt(0,100) > 0) //(10*MCGame.Get().playerStats.scoreMultiplier) )
+            if(Command.rand.getInt(0,100) > (10*GameInst.playerStats.scoreMultiplier) )
+            //if(false)
             {
                 target.x  = 25 + Command.rand.getInt(0,900);
                 target.y = 768;
@@ -102,11 +103,11 @@ class LaunchMissileCommand extends Command
             else
             {
                 // go for a silo or city
-                var targetIndex = Command.rand.getInt(0,10);
+                var targetIndex = Command.rand.getInt(0,9);
 
                 if(targetIndex < 3)
                 {
-                    target = GameInst.silos[targetIndex].position.clone();
+                    target.set(GameInst.silos[targetIndex].position);
 
                     var r = Command.rand.getInt(0,10);
                     var variance = r - 5;
@@ -116,19 +117,20 @@ class LaunchMissileCommand extends Command
                 else
                 {
                     var targetCity = targetIndex-3;
+
                     while(GameInst.getActiveCityCount() > 0 && GameInst.cities[targetCity].active == false)
                     {
                         targetCity++;
                         targetCity %= 6;
                     }
 
-                    target = GameInst.cities[targetCity].position.clone(); // TL corner
+                    target.set(GameInst.cities[targetCity].position); // TL corner
                     target.x += City.width()/2;
                     target.y += City.height()/2;
                 }
             }
 
-            var speed = 2.0;
+            var speed = 2.0 * GameInst.playerStats.scoreMultiplier/2.0;
 
             GameInst.addBaddieMissile(start,target,speed);
 
@@ -162,7 +164,7 @@ class IncreaseMultiplerCommand extends Command
 
     execute()
     {
-        //MCGame.Get().IncreaseMultipler();
+        GameInst.increaseMultipler=true;
     }
 
     hasCompleted()

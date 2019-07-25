@@ -4,8 +4,11 @@ class MissileBase extends GameObject
     {
         super();
 
-        this.start = position.clone();
-        this.target = target.clone();
+        this.start = new Vector2()
+        this.start.set(position);
+
+        this.target = new Vector2();
+        this.target.set(target);
         this.currentColour = 0;
 
         this.collider = new LineCollider();
@@ -16,7 +19,7 @@ class MissileBase extends GameObject
         this.velocity.x *= speed;
         this.velocity.y *= speed;
 
-        this.position = this.start.clone();
+        this.position.set(this.start);
     }
 
     update()
@@ -49,12 +52,12 @@ class MissileBase extends GameObject
         }
         else
         {
-            GAZCanvas.Line(this.start,this.position,this.col,2);
+            GAZCanvas.Line(this.start,this.position,col,2);
 
             let head = new Rect(this.position.x,this.position.y,4,4);
             head.x -=2;
             head.y -=2;
-            GAZCanvas.Rect(head,this.currentColour, true,1)
+            GAZCanvas.Rect(head,GameInst.randomColour(), true,1)
         }
     }
 }
@@ -71,12 +74,7 @@ class PlayerMissile extends MissileBase
 {
     constructor(location, target)
     {
-        super();
-        this.start = location;
-        this.target = target;
-
-        super.setUp(15.0);
-
+        super(location,target, 15);
         //missileNoise = null;
         //GameAudio.Get().PlayMissileTravel(this);
     }
@@ -89,12 +87,11 @@ class PlayerMissile extends MissileBase
 
     draw()
     {
-        super.draw('#ffffff');//MCGame.Get().GetPlayerColour());
-        //MCGame.Get().DrawMarker(target,MCGame.Get().GetRandomColour());
+        super.draw(GameInst.getPlayerColour());
     }
 
     isAtTarget()
     {
-        return this.position.distance(this.target) < velocity.length();
+        return this.position.distance(this.target) < this.velocity.length();
     }
 }

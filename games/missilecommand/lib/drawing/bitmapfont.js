@@ -56,6 +56,8 @@ class BitmapFont
                 Offset.y -= size.y/2;
                 break;
             default:
+                Offset.x = 0;
+                Offset.y = 0;
                 break;
         }
     }

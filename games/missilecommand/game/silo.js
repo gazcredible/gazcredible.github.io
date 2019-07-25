@@ -10,19 +10,27 @@ class silo extends GameObject
         return 20;
     }
 
-    constructor(Location, valid)
+    constructor(location, active)
     {
-        super(Location);
+        if(active == undefined)
+        {
+            active = true;
+        }
 
+        super();
+
+
+        this.position.set(location);
+        this.active = active;
         this.collider = new RectCollider(silo.width(),silo.height());
-        this.collider.setTransform(Matrix.CreateTranslation(Location.x, Location.y,0));
+        this.collider.setTransform(Matrix.CreateTranslation(this.position.x, this.position.y,0));
 
-        this.onLevelStart(valid);
+        this.onLevelStart(this.active);
     }
 
-    onLevelStart(valid)
+    onLevelStart(active)
     {
-        super.onLevelStart(valid);
+        super.onLevelStart(active);
 
         if(this.active == true)
         {
@@ -57,7 +65,8 @@ class silo extends GameObject
 
             for(let i=0;i<this.missileCount;i++)
             {
-                GameInst.drawMissile(pos[i] + this.position);
+                var p = new Vector2(pos[i].x + this.position.x, pos[i].y + this.position.y+5);
+                GameInst.drawMissile(p);
             }
         }
 
@@ -99,14 +108,17 @@ class silo extends GameObject
 
     launchMissile(target)
     {
-        GameInst.addPlayerMissile(this.position,target);
+        if(this.active == true)
+        {
+            GameInst.addPlayerMissile(this.position, target);
 
-        this.missileCount--;
+            this.missileCount--;
+        }
     }
 
     canLaunch()
     {
-        if(this.isValid() == false)	return false;
+        if(this.active == false)	return false;
         if(this.missileCount == 0) return false;
 
         return true;
@@ -114,7 +126,7 @@ class silo extends GameObject
 
     getMissileCount()
     {
-        if(this.isValid() == false)	return 0;
+        if(this.active == false)	return 0;
         return this.missileCount;
     }
 

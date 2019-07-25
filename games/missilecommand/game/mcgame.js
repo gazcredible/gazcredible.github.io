@@ -22,6 +22,12 @@ class mcgame
 
         this.playerStats = new PlayerStats();
 
+        this.displayScore = false;
+        this.displayPlayer = false;
+
+        this.drawRand = new Random(1234);
+
+
         this.colourTable =
         [
             '#ffff00',
@@ -92,6 +98,29 @@ class mcgame
         this.onStartNewGame();
     }
 
+    onStartNewGame()
+    {
+        this.player = new PlayerObject();
+        this.playerStats = new PlayerStats();
+
+        for(let i=0;i<this.cities.length;i++)
+        {
+            this.cities[i].active = true;
+        }
+
+
+        //GameAudio.Get().OnStartNewGame();
+        this.baddieMissileList = [];
+        this.playerMissileList = [];
+        this.explosionList = [];
+
+        this.onLevelStart();
+
+        this.levelManager.onStartNewGame();
+
+        this.disableEmptySiloText = false;
+    }
+
     onLevelStart()
     {
         for(let i=0;i<this.silos.length;i++)
@@ -119,23 +148,7 @@ class mcgame
         this.levelManager.startLevel();
     }
 
-    onStartNewGame()
-    {
-        this.player = new PlayerObject();
-        this.playerStats = new PlayerStats();
 
-
-        //GameAudio.Get().OnStartNewGame();
-        this.baddieMissileList = [];
-        this.playerMissileList = [];
-        this.explosionList = [];
-
-        this.onLevelStart();
-
-        this.levelManager.onStartNewGame();
-
-        this.disableEmptySiloText = false;
-    }
 
     update()
     {
@@ -176,6 +189,42 @@ class mcgame
     {
         this.explosionList.push(new Explosion(location,collidable,playerOwned));
     }
+
+    isGameOver()
+    {
+        return this.playerStats.isGameOver();
+    }
+
+    onLevelComplete()
+    {
+        this.playerStats.onLevelComplete();
+    }
+
+    removeBulletForPostWave()
+    {
+        for(let i=0;i<this.silos.length;i++)
+        {
+            if(this.silos[i].getMissileCount() > 0)
+            {
+                this.silos[i].removeBulletForPostWave();
+                return;
+            }
+        }
+    }
+
+    removeCityForPostWave()
+    {
+        for(let i=0;i<this.cities.length;i++)
+        {
+            if(this.cities[i].active == true)
+            {
+                this.cities[i].active = false;
+                return;
+            }
+        }
+    }
+
+
 
     onUpdateGame()
     {
@@ -247,7 +296,7 @@ class mcgame
 
                 for(let j=0;j<this.explosionList.length;j++)
                 {
-                    if(this.explosionList[j].isInMe(this.baddieMissileList[i].position) && exlodedAlready == false)
+                    if(this.explosionList[j].collider.isPointInMe(this.baddieMissileList[i].position) && explodedAlready == false)
                     {
                         explodedAlready = true;
 
@@ -262,7 +311,11 @@ class mcgame
                 {
                     for (let j = 0; j < this.cities.length; j++)
                     {
-                        if ((this.baddieMissileList[i].collider.collides(this.cities[j].collider) == true) && (explodedAlready == false))
+                        if ((this.cities[j].active == true)
+                            && (explodedAlready == false)
+                            && (this.baddieMissileList[i].collider.collides(this.cities[j].collider) == true)
+
+                        )
                         {
                             this.cities[j].onExplode();
                             explodedAlready = true;
@@ -272,9 +325,14 @@ class mcgame
 
                 if(explodedAlready == false)
                 {
-                    for (let j = 0; j < this.silos.length; j++) {
-                        if ((this.baddieMissileList[i].collider.collides(this.silos[j].collider) == true) && (explodedAlready == false)) {
-                            this.silos[i].onExplode();
+                    for (let j = 0; j < this.silos.length; j++)
+                    {
+                        if ((this.silos[j].active == true)
+                            && (explodedAlready == false)
+                            && (this.baddieMissileList[i].collider.collides(this.silos[j].collider) == true)
+                        )
+                        {
+                            this.silos[j].onExplode();
                             explodedAlready = true;
                         }
                     }
@@ -338,15 +396,29 @@ class mcgame
             this.explosionList[i].draw();
         }
 
-        debugFont.setScale(3.0);
-        debugFont.print(new Vector2(150, 20), this.playerStats.score,'right');
-    
-        this.player.draw();
+        if(this.displayScore == true)
+        {
+            debugFont.setScale(3.0);
+            debugFont.print(new Vector2(150, 20), this.playerStats.score.toString(), 'right');
+            debugFont.setScale(1.0);
+        }
+
+        if(this.displayPlayer == true)
+        {
+            this.player.draw();
+        }
     }
 
-    hasWaveFinished()
+    randomColour()
     {
-        return this.bWaveEnded;
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++)
+        {
+            color += letters[this.drawRand.getInt(0,letters.length) ];
+        }
+
+        return color;
     }
 
     getGroundColour()
@@ -371,7 +443,8 @@ class mcgame
 
     drawMissile(position)
     {
-        debugFont.print(position,'.','centre');
+        GAZCanvas.Rect(new Rect(position.x,position.y,5,8),this.getPlayerColour(),true);
+
     }
 
     drawCity(position)

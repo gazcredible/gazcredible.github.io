@@ -1,17 +1,8 @@
 class Explosion extends GameObject
 {
-    constructor()
+    constructor(location, collidable, playerOwned)
     {
         super();
-
-        this.rad = 0;
-        this.dir = 0;
-        this.tick = 0;
-    }
-
-    onOneTimeInit(location, collidable, playerOwned)
-    {
-        this.Position = this.location;
 
         this.rad = 1;
         this.dir = 5;
@@ -25,13 +16,14 @@ class Explosion extends GameObject
         //GameAudio.Get().ExplodeObject(this);
 
         this.ownedByPlayer = playerOwned;
+        this.position = location;
     }
 
     update()
     {
         if(this.collider != null)
         {
-            this.collider.init(rad);
+            this.collider.initCircleCollider(this.rad);
             this.collider.setTransform(Matrix.CreateTranslation(this.position.x,this.position.y,0));
         }
 
@@ -39,30 +31,31 @@ class Explosion extends GameObject
         {
             if(this.rad > 35)
             {
-                this.dir = -vdir;
+                this.dir = -this.dir;
             }
 
             this.rad += this.dir;
         }
 
+        this.active = (this.rad > 0);
+
         this.tick++;
     }
     draw()
     {
-        if(this.drawCollisions == true)
+        super.draw();
+
+        if(this.ownedByPlayer == true)
         {
-            super.Draw();
+            this.collider.draw(GameInst.getPlayerColour(), 2);
         }
         else
         {
-            this.collider.draw()
+            this.collider.draw(GameInst.getBaddieColour(), 2);
         }
-    }
-    isDead()
-    {
-        return this.rad < 0;//((dir < 10) & (rad < dir));
-    }
 
+
+    }
     getRadius()
     {
         return this.rad;

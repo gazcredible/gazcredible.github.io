@@ -97,8 +97,13 @@ class ColliderBase
         return oddNodes;
     }
 
-    draw(col)
+    draw(col,thickness)
     {
+        if(thickness == undefined)
+        {
+            thickness = 1;
+        }
+
         if (this.worldPointList.Count == 0) return;
     
         for(let i = 0;i< this.localPointList.length;i+=2)
@@ -106,7 +111,7 @@ class ColliderBase
             var v0 = this.worldPointList[i];
             var v1 = this.worldPointList[i+1];
 
-            GAZCanvas.Line(v0,v1,col,1);
+            GAZCanvas.Line(v0,v1,col,thickness);
         }
     }
 }

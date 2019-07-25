@@ -21,9 +21,9 @@ class GameObject
     
     }
 
-    onLevelStart(valid)
+    onLevelStart(active)
     {
-
+        this.active = active;
     }
 
     onExplode()
@@ -37,7 +37,10 @@ class GameObject
     
     draw()
     {
-    
+        if((this.drawCollisions == true) && (this.collider != undefined))
+        {
+            this.collider.draw('#ffffff');
+        }
     }
     
 }

@@ -1,13 +1,8 @@
 class RectCollider extends PolyCollider
 {
-
-    constructor()
+    constructor(width, height)
     {
         super();
-    }
-    init(width, height)
-    {
-        super.init ();
 
         var polyList = [];
         polyList.push(new Vector2(-width/2,-height/2));
@@ -17,4 +12,4 @@ class RectCollider extends PolyCollider
 
         super.initFromEdgeList(polyList);
     }
-};
+}
