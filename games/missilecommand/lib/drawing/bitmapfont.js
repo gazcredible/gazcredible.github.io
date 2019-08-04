@@ -98,7 +98,7 @@ class BitmapFont
 
                     GAZCanvas.Sprite(this.image
                         ,new Rect(position.x+offset.x,position.y+offset.y, 8*this.scaleFactor, 8*this.scaleFactor)
-                        ,new Rect(Math.floor(charIndex % 16)*8, Math.floor(charIndex / 16)*8, 8,8)
+                        ,new Rect(Math.floor(charIndex % 16)*8, Math.floor(charIndex / 16)*8, 8,7.5)
                     );
 
                     offset.x +=8 * this.scaleFactor;
