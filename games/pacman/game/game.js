@@ -43,14 +43,15 @@ class Game
 
         this.pillMap.onNewLevel();
 
-        for(let i=0;i<8;i++)
+
+        for(let i=0;i<10;i++)
         {
             this.ghosts.push(new Ghost('red'));
             this.ghosts.push(new Ghost('pink'));
             this.ghosts.push(new Ghost('orange'));
             this.ghosts.push(new Ghost('cyan'));
         }
-    }
+     }
 
     
     onAttactMode()

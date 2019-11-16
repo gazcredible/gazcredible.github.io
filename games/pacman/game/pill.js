@@ -77,7 +77,10 @@ class PillMap
 
             if (this.map[key] instanceof PowerPill)
             {
-                GameInst.spritesheet.DrawSprite('power-pill', new Vector2(x * 8, y * 8));
+                if ((GameInst.frameCount % 16) > 8)
+                {
+                    GameInst.spritesheet.DrawSprite('power-pill', new Vector2(x * 8, y * 8));
+                }
             }
             else
             {

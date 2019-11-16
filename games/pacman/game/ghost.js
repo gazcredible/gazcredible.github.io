@@ -29,10 +29,6 @@ class Ghost
         var v = this.target.split(':');
         this.position.x = parseInt(v[0]);
         this.position.y = parseInt(v[1]);
-
-
-        print('');
-        //this.targetNode =
     }
 
     getNodePosition(label)
