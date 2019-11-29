@@ -39,6 +39,7 @@ class Drummachine
         //as the function isn't part of the drummachine class
         this.playButton = new GUIButtonText(new Rect(1400,400,150,50), "PLAY", function (button)
         {
+            drummachineInst.audioContext.resume();
             if(drummachineInst.mode === "play")
             {
                 drummachineInst.mode = "pause";
