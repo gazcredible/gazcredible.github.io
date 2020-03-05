@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fredboard</title>
+    <script src="lib/vector2.js"></script>
+    <script src="lib/vector3.js"></script>
+    <script src="lib/vector4.js"></script>
+    <script src="lib/matrix.js"></script>
+    <script src="lib/circularcollider.js"></script>
+    <script src="lib/rect.js"></script>
+    <script src="lib/size.js"></script>
+    <script src="lib/input.js"></script>
+    <script src="lib/canvas.js"></script>
+    <script src="lib/gazcanvas.js"></script>
+    <script src="lib/statemachine.js"></script>
+
+
+
+    <script src="game/button.js"></script>
+    <script src="game/guitar.js"></script>
+    <script src="game/fretboard.js"></script>
+
+    <!--https://fonts.google.com/-->
+    <link href='https://fonts.googleapis.com/css?family=Noto Sans' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+</body>
+</html>
+
+<script>
+    document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+    document.body.scroll = "no"; // ie only
+    document.body.style.padding = 0;
+    document.body.style.margin = 0;
+
+    fretbaordInst.Run();
+</script>
