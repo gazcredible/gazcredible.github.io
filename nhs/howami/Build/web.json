@@ -1,9 +1,9 @@
 {
 "companyName": "FalmouthUniversity",
 "productName": "HowAmI",
-"dataUrl": "uitestbed.data.unityweb",
-"wasmCodeUrl": "uitestbed.wasm.code.unityweb",
-"wasmFrameworkUrl": "uitestbed.wasm.framework.unityweb",
+"dataUrl": "web.data.unityweb",
+"wasmCodeUrl": "web.wasm.code.unityweb",
+"wasmFrameworkUrl": "web.wasm.framework.unityweb",
 "TOTAL_MEMORY": 268435456,
 "graphicsAPI": ["WebGL 2.0", "WebGL 1.0"],
 "webglContextAttributes": {"preserveDrawingBuffer": false},
