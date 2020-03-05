@@ -49,7 +49,7 @@ class DemoGame extends BaseGame {
 
         this.things = [];
 
-        for (let i = 0; i < 3000; i++) {
+        for (let i = 0; i < 10000; i++) {
             let thing = new Thing();
             thing.Init();
             this.things.push(thing);

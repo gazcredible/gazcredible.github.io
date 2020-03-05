@@ -57,6 +57,37 @@
 
     let ptime = performance.now();
 
+    class Timer
+    {
+        constructor()
+        {
+            this.values = new Float32Array(60);
+            this.index = 0;
+
+        }
+
+        Add(val)
+        {
+            this.values[this.index] = val;
+            this.index = (this.index+1)% this.values.length;
+        }
+
+        Get()
+        {
+            let sum = 0;
+            for(let i=0;i<this.values.length;i++)
+            {
+                sum += this.values[i];
+            }
+
+            return sum /this.values.length;
+        }
+    }
+
+    let ltimer = new Timer();
+    let rtimer = new Timer();
+    let ftimer = new Timer();
+
     function render(time)
     {
         var now = time * 0.001;
@@ -69,11 +100,11 @@
         //do state machine update
         let ltime = performance.now();
         DemoGameInst.stateMachine.update();
-        ltime = performance.now() - ltime;
+        ltimer.Add(performance.now() - ltime);
 
         let rtime = performance.now();
         DemoGameInst.stateMachine.draw();
-        rtime = performance.now() - rtime;
+        rtimer.Add( performance.now() - rtime);
 
         Canvas.ctx().canvas.width  = window.innerWidth;
         Canvas.ctx().canvas.height = window.innerHeight;
@@ -83,10 +114,12 @@
 
         ptime = performance.now() - ptime;
 
-        Canvas.Text(60,deltaTime*1000,new Vector2(0,60),'#ffffff')
+        ftimer.Add(deltaTime*1000);
 
-        Canvas.Text(60,ltime, new Vector2(0,120),'#ffffff')
-        Canvas.Text(60,rtime, new Vector2(0,180),'#ffffff')
+        Canvas.Text(60,ftimer.Get().toFixed(2),new Vector2(0,60),'#ffffff')
+
+        Canvas.Text(60,ltimer.Get().toFixed(2), new Vector2(0,120),'#ffffff')
+        Canvas.Text(60,rtimer.Get().toFixed(2), new Vector2(0,180),'#ffffff')
 
         ptime = performance.now();
 
