@@ -1,200 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        .container {
+            position: relative;
+        }
+
+        #text {
+            position: absolute;
+            background-color: transparent;
+            left: 0px;
+            top: 0px;
+            z-index: 10;
+        }
+    </style>
+
+
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="vector3.js"></script>
-    <script src="vector4.js"></script>
-    <script src="matrix.js"></script>
-    <script src="glsupport.js"></script>
-    <script src="debugrenderer.js"></script>
+    <script src="lib/vector2.js"></script>
+    <script src="lib/vector3.js"></script>
+    <script src="lib/vector4.js"></script>
+    <script src="lib/matrix.js"></script>
+    <script src="lib/rect.js"></script>
+    <script src="lib/input.js"></script>
+    <script src="lib/glsupport.js"></script>
+    <script src="lib/debugrenderer.js"></script>
+    <script src="lib/statemachine.js"></script>
+    <script src="lib/canvas.js"></script>
+    <script src="lib/basegame.js"></script>
+    <script src="game/demogame.js"></script>
+    <script src="game/gamestates.js"></script>
 </head>
+
+<div class="container">
+    <canvas id="glcanvas"></canvas>
+    <canvas id="text"></canvas>
+</div>
+
 <body>
-<canvas id="canvas"></canvas>
+
+
 </body>
 
 <script>
+    document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+    document.body.scroll = "no"; // ie only
+    document.body.style.padding = 0;
+    document.body.style.margin = 0;
+
     "use strict";
+    //DemoGameInst.Run(DemoGameInst);
 
-    // Get A WebGL context
-    /** @type {HTMLCanvasElement} */
-    var canvas = document.getElementById("canvas");
-    var gl = canvas.getContext("webgl");
+    DemoGameInst.oneTimeInit();
+    var then = 0;
 
-    var vsSource = `
-    attribute vec4 position;
-    attribute vec4 colour;
-    uniform mat4 matrix;
+    let ptime = performance.now();
 
-    varying vec4 f_colour;
-    void main()
+    function render(time)
     {
-        gl_Position = matrix * position;
-        f_colour = colour;
-    }`;
+        var now = time * 0.001;
+        var deltaTime = Math.min(0.1, now - then);
+        then = now;
 
-    var psSource = `
-    precision mediump float;
-    varying vec4 f_colour;
+        Input.update();
+        DemoGameInst.frameCount++;
 
-    void main()
-    {
-        gl_FragColor = f_colour;
-    }`;
+        //do state machine update
+        let ltime = performance.now();
+        DemoGameInst.stateMachine.update();
+        ltime = performance.now() - ltime;
 
-    var vs = compileShader(gl,vsSource,gl.VERTEX_SHADER);
-    var ps = compileShader(gl,psSource,gl.FRAGMENT_SHADER);
+        let rtime = performance.now();
+        DemoGameInst.stateMachine.draw();
+        rtime = performance.now() - rtime;
 
-    var program = createProgram(gl,vs,ps);
+        Canvas.ctx().canvas.width  = window.innerWidth;
+        Canvas.ctx().canvas.height = window.innerHeight;
 
-    // look up where the vertex data needs to go.
-    var positionLocation = gl.getAttribLocation(program, "position");
-    var colourLocation = gl.getAttribLocation(program, "colour");
+        Canvas.ctx().clearRect(0,0,Canvas.ctx().width,Canvas.ctx().height);
+        // Canvas.Rect(new Rect(0,0,500,500),'#ff00ff',true)
 
-    // lookup uniforms
-    var resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-    var colorLocation = gl.getUniformLocation(program, "color");
-    var matrixLoc = gl.getUniformLocation(program, "matrix");
+        ptime = performance.now() - ptime;
 
-    // Create a buffer to put positions in
-    var positionBuffer = gl.createBuffer();
+        Canvas.Text(60,deltaTime*1000,new Vector2(0,60),'#ffffff')
 
-    // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        Canvas.Text(60,ltime, new Vector2(0,120),'#ffffff')
+        Canvas.Text(60,rtime, new Vector2(0,180),'#ffffff')
 
-    var translation = [0, 0];
-    var width = 100;
-    var height = 30;
-    var color = [Math.random(), Math.random(), Math.random(), 1];
+        ptime = performance.now();
 
-    function updatePosition(index)
-    {
-        return function(event, ui) {
-            translation[index] = ui.value;
-            drawScene();
-        }
+
+        requestAnimationFrame(render);
     }
+    requestAnimationFrame(render);
 
-    var debugRenderer = new DebugRenderer();
-    debugRenderer.Init(gl,32000*6);
-
-    class Thing
-    {
-        constructor()
-        {
-            this.x = 0;
-            this.y = 0;
-            this.dx = 0;
-            this.dy = 0;
-        }
-
-        Init()
-        {
-            this.x = (Math.random()*600) + 100
-            this.y = (Math.random()*250)+100
-
-            var a =Math.random()*(6.28)
-
-            var speed = (Math.random()*2.5) + 0.5
-            this.dx = Math.sin(a)*speed
-            this.dy = Math.cos(a)*speed
-
-            this.colour = [Math.random()*0.7 + 0.3,Math.random()*0.7 + 0.3,Math.random()*0.7 + 0.3,1];
-        }
-
-        Update()
-        {
-            var fdx = this.dx;
-            var fdy = this.dy;
-
-            if (((this.x + fdx) < -16) || ((this.x + fdx) > 800 - 16)) {
-                this.dx = -this.dx;
-            }
-
-            if (((this.y + fdy) < -16) || ((this.y + fdy) > 450 - 16))
-            {
-                this.dy = -this.dy;
-            }
-
-            this.x += this.dx;
-            this.y += this.dy;
-        }
-    }
-
-    var things = [];
-
-    for(var i=0;i<10000;i++)
-    {
-        var thing = new Thing();
-        thing.Init();
-        things.push(thing);
-    }
-
-
-    var angle = 0;
-    setInterval(function()
-    {
-        //update ....
-
-        for(var i=0;i< things.length;i++)
-        {
-            things[i].Update();
-        }
-
-        //draw ....
-        // Tell WebGL how to convert from clip space to pixels
-        gl.canvas.width = window.innerWidth -15;
-        gl.canvas.height = window.innerHeight-20;
-
-        //gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.clearColor(0,0,0,1);
-
-        debugRenderer.OnStartDrawing();
-
-        for(var x=0;x< 13;x++)
-        {
-            for(var y=0;y<8;y++)
-            {
-                debugRenderer.AddRect( x*64,y*64, 32,32, [1,0,0,1]);
-            }
-        }
-
-        for(var i=0;i< things.length;i++)
-        {
-            debugRenderer.AddRect( things[i].x, things[i].y,16,16,things[i].colour)
-        }
-
-        var m = matrix.CreateOrthoOffCenter(0,gl.canvas.width,gl.canvas.height,0,1,32000);
-
-        gl.disable(gl.CULL_FACE);
-
-        debugRenderer.Draw(gl,m,6,gl.TRIANGLES);
-        angle += 0.01;
-    },16);
-
-    // Fill the buffer with the values that define a rectangle.
-    function setRectangle(gl, x, y,z, width, height)
-    {
-        var x1 = x;
-        var x2 = x + width;
-        var y1 = y;
-        var y2 = y + height;
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            new Float32Array([
-                x1, y1,z, 1,0,0,1,
-                x2, y1,z, 1,1,0,1,
-                x1, y2,z, 1,0,1,1,
-                x1, y2,z, 1,0,1,1,
-                x2, y1,z, 1,1,0,1,
-                x2, y2,z, 1,1,0,1,
-            ]),
-            gl.STATIC_DRAW);
-    }
 
 
 </script>
