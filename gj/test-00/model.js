@@ -52,6 +52,11 @@ function logical_to_drawing_postion(x,y)
     return [offset.x +(x*MapCell_Size),offset.y+(y*MapCell_Size),MapCell_Size-1,MapCell_Size-1];
 }
 
+function logical_to_drawing_postion_from_mapcell(mapcell)
+{
+    return logical_to_drawing_postion(mapcell.x,mapcell.y);
+}
+
 class NavGrid
 {
     constructor()
@@ -98,8 +103,9 @@ class NavGrid
 
 class GameObject
 {
-    constructor()
+    constructor(model)
     {
+        this.model = model;
         this.logicalPosition = new Vector2(0,0);
     }
 
@@ -120,6 +126,14 @@ class GameObject
         if(cell.x > 19)  return false;
         if(cell.y > 11)  return false;
 
+        for(let i=0;i< this.model.obstacles.length;i++)
+        {
+            if(cell.Equals(this.model.obstacles[i].currentCell()) === true)
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -133,21 +147,50 @@ class GameObject
         return false;
     }
 
+    setFromMapCell(mapcell)
+    {
+        this.logicalPosition.x = mapcell.x;
+        this.logicalPosition.y = mapcell.y;
+    }
+
     currentCell()
     {
         return new MapCell( Math.floor(this.logicalPosition.x), Math.floor(this.logicalPosition.y));
     }
 }
 
+class GameObstacle extends GameObject
+{
+    constructor(model)
+    {
+        super(model);
+    }
+
+    setFromMapCell(mapcell)
+    {
+        super.setFromMapCell(mapcell);
+    }
+
+    draw()
+    {
+        super.draw()
+        let pos = logical_to_drawing_postion_from_mapcell(this.currentCell());
+        let rect =  new Rect(pos[0]+2,pos[1]+2,MapCell_Size-4,MapCell_Size-4)
+        GAZCanvas.Rect(rect,'#ffff00',true);
+    }
+}
+
 class GameAgent extends GameObject
 {
-    constructor()
+    constructor(model)
     {
-        super();
+        super(model);
         //TBD
         this.pathAgent = new PathAgent(this);
+        this.pathAgent.use4wayList = false;
         this.pathAgent.Init(this.currentCell(), new MapCell(19,11));
     }
+
 
     update()
     {
@@ -167,7 +210,49 @@ class GameAgent extends GameObject
 
         let rect =  new Rect(pos[0],pos[1],baddie_size,baddie_size)
         GAZCanvas.Rect(rect,'#ff0000',true);
+
+        let route = this.pathAgent.GetRoute();
+
+        if(route !== undefined)
+        {
+            for(let i=0;i< route.length-1;i++)
+            {
+                let pos0 = logical_to_drawing_postion(route[i].x,route[i].y);
+
+                pos0[0] += ((MapCell_Size)/2);
+                pos0[1] += ((MapCell_Size)/2);
+
+                let pos1 = logical_to_drawing_postion(route[i+1].x,route[i+1].y);
+
+                pos1[0] += ((MapCell_Size)/2);
+                pos1[1] += ((MapCell_Size)/2);
+
+                GAZCanvas.Line(new Vector2(pos0[0], pos0[1]),new Vector2(pos1[0], pos1[1]),'#ff0000',2);
+            }
+        }
     }
+
+    IsValidCell(cell)
+    {
+        if(cell.x < 0)  return false;
+        if(cell.y < 0)  return false;
+
+        if(cell.x > 19)  return false;
+        if(cell.y > 11)  return false;
+
+        return super.IsValidCell(cell);
+    }
+
+    IsValidTransition(start, target)
+    {
+        if(this.IsValidCell(target) === true)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
 }
 
 class Model
@@ -175,23 +260,64 @@ class Model
     constructor()
     {
         this.navgrid = new NavGrid();
-
+        this.obstacles = [];
+        this.baddies = [];
     }
 
     init()
     {
         this.navgrid.init(20,12);
-        this.agent = new GameAgent();
+
+        this.obstacles = [];
+
+        for(let x=0;x<10;x++)
+        {
+            let obstacle = new GameObstacle(this);
+
+            obstacle.setFromMapCell(new MapCell(x, 5));
+            this.obstacles.push(obstacle);
+        }
+
+
+        for(let x=7;x<20;x++)
+        {
+            let obstacle = new GameObstacle(this);
+
+            obstacle.setFromMapCell(new MapCell(x, 8));
+            this.obstacles.push(obstacle);
+        }
+
+
+        this.baddies = [];
+
+        let baddie = new GameAgent(this);
+        this.baddies.push(baddie);
     }
 
     update()
     {
-        this.agent.update();
+        for(let i=0;i< this.baddies.length;i++)
+        {
+            this.baddies[i].update();
+        }
+
+        for(let i=0;i< this.obstacles.length;i++)
+        {
+            this.obstacles[i].update();
+        }
     }
 
     draw()
     {
         this.navgrid.draw();
-        this.agent.draw();
+        for(let i=0;i< this.baddies.length;i++)
+        {
+            this.baddies[i].draw();
+        }
+
+        for(let i=0;i< this.obstacles.length;i++)
+        {
+            this.obstacles[i].draw();
+        }
     }
 }

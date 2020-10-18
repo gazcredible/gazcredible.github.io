@@ -75,8 +75,8 @@ class PathAgent
         this.closedList = {}; //new Dictionary<MapCell,int>();
 
         this.owner = owner;
-        //this.use4wayList = false;
-        this.use4wayList = true;
+        this.use4wayList = false;
+        //this.use4wayList = true;
 
         this.pathRoute = new Array();//new List<MapCell>();
 
@@ -283,9 +283,9 @@ class PathAgent
         return cell;
     }
     
-    GetRoute(route)
+    GetRoute()
     {
-        route = [];
+        let route = [];
     
         if (this.owner.currentCell().Equals(this.target) === true)
         {
