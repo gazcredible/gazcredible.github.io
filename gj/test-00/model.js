@@ -92,6 +92,16 @@ class NavGrid
                 GAZCanvas.Text(12, this.getCell(x,y).toString(), rect.getCentre(),'#ffffff','centre');
             }
         }
+
+        for(let y=0;y<this.grid.length; y+=2)
+        {
+            for(let x=0;x < this.grid[y].length;x+=2)
+            {
+                let pos = logical_to_drawing_postion(x,y);
+                let rect =  new Rect(pos[0],pos[1],MapCell_Size*2-1,MapCell_Size*2-1)
+                GAZCanvas.Rect(rect,'#0000ff',false,1);
+            }
+        }
     }
 
     getCell(x,y)
@@ -187,7 +197,7 @@ class GameAgent extends GameObject
         super(model);
         //TBD
         this.pathAgent = new PathAgent(this);
-        this.pathAgent.use4wayList = false;
+        this.pathAgent.use4wayList = true;
         this.pathAgent.Init(this.currentCell(), new MapCell(19,11));
     }
 
