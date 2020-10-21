@@ -1815,3 +1815,121 @@ class AABB
     }
 }
 
+class ParametricLine
+{
+    constructor()
+    {
+        this.x0 = 0;
+        this.y0 = 0;
+
+        this.x1 = 0;
+        this.y1 = 0;
+    }
+
+    init(sx, sy, fx, fy)
+    {
+        this.x0 = sx;
+        this.y0 = sy;
+
+        this.x1 = fx;
+        this.y1 = fy;
+    }
+
+    getIntercept(line, intercept)
+    {
+        //block rejection test ...
+        if ((line.x0 < Math.min(this.x0, this.x1)) && (line.x1 < Math.min(this.x0, this.x1))) return false;
+        if ((line.x0 > Math.max(this.x0, this.x1)) && (line.x1 > Math.max(this.x0, this.x1))) return false;
+
+        if ((line.y0 < Math.min(this.y0, this.y1)) && (line.y1 < Math.min(this.y0, this.y1))) return false;
+        if ((line.y0 > Math.max(this.y0, this.y1)) && (line.y1 > Math.max(this.y0, this.y1))) return false;
+
+        let a = this.x0;
+        let c = this.x1 - this.x0;
+        let d = line.x0;
+        let f = line.x1 - line.x0;
+        let g = this.y0;
+        let h = this.y1 - this.y0;
+        let i = line.y0;
+        let j = line.y1 - line.y0;
+        let k = ((j * c) - (f * h));
+
+        if (Math.abs(k) < 0.001) return false;
+
+        let t = ((j * (d - a)) + (f * (g - i))) / k;
+
+        if (t > 1 || t < 0) return false;
+
+        intercept.x = this.x0 + t * (this.x1 - this.x0);
+        intercept.y = this.y0 + t * (this.y1 - this.y0);
+
+        if (Math.abs(line.x1 - line.x0) > 0)
+        {
+            t = (intercept.x - line.x0) / (line.x1 - line.x0);
+        }
+        else
+        {
+            t = (intercept.y - line.y0) / (line.y1 - line.y0);
+        }
+
+        if (t > 1 || t < 0) return false;
+
+        return true;
+    }
+}
+
+class ColliderBase
+{
+    constructor()
+    {
+        this.linelist = [];
+    }
+
+    collides(obj)
+    {
+        let bGotCollision = false;
+        let result = new Vector2();
+
+        for (let isrc = 0; isrc < obj.linelist.length; isrc++)
+        {
+            for (let idst = 0; idst < this.linelist.length; idst++)
+            {
+                if (obj.linelist[isrc].getIntercept(this.linelist[idst], result))
+                {
+                    return true
+                }
+            }
+        }
+
+        return false;
+    }
+}
+
+class PolyCollider extends ColliderBase
+{
+    constructor()
+    {
+        super();
+    }
+
+    init(edgeList)
+    {
+        for(let i=0;i<edgeList.length;i++)
+        {
+            let nextIndex = (i+1)%edgeList.length;
+            let line = new ParametricLine();
+            line.init(edgeList[i].x,edgeList[i].y,edgeList[nextIndex].x,edgeList[nextIndex].y);
+            this.linelist.push(line);
+        }
+    }
+}
+
+class LineCollider extends ColliderBase
+{
+    init(x0, y0, x1, y1)
+    {
+        let line = new ParametricLine();
+        line.init(x0,y0,x1,y1);
+        this.linelist.push(line);
+    }
+}
