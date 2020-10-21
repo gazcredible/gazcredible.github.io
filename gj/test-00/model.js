@@ -35,6 +35,11 @@ class IVector2
     {
         return Math.sqrt( Math.pow(this.x-source.x,2) + Math.pow(this.y - source.y,2));
     }
+
+    toVector2()
+    {
+        return new Vector2(this.x, this.y);
+    }
 }
 
 class MapCell extends IVector2
@@ -42,8 +47,17 @@ class MapCell extends IVector2
     constructor(x,y)
     {
         super();
-        this.x = x;
-        this.y = y;
+
+        if(x !== undefined)
+        {
+            this.x = x;
+            this.y = y;
+        }
+        else
+        {
+            this.x = 0;
+            this.y = 0;
+        }
         this.owner = -1;
     }
 
@@ -537,6 +551,7 @@ class Baddie extends GameAgent
         super();
 
         this.target = undefined;
+        this.velocity = new Vector2();
     }
 
     init(mapcell)
@@ -547,14 +562,29 @@ class Baddie extends GameAgent
 
         this.logicalPosition.x = mapcell.x;
         this.logicalPosition.y = mapcell.y;
+
+        this.canMove = false;
+        this.currentTarget = undefined;
+
+        this.route = undefined;
+        this.beats_per_cell = 1;
     }
 
     update()
     {
         super.update();
-        if(this.pathAgent.canReachTarget() === false)
+
+        if(this.canMove === true)
         {
-            this.pathAgent.update();
+            this.logicalPosition.x += this.velocity.x;
+            this.logicalPosition.y += this.velocity.y;
+        }
+        else
+        {
+            if (this.pathAgent.canReachTarget() === false)
+            {
+                this.pathAgent.update();
+            }
         }
     }
 
@@ -570,24 +600,91 @@ class Baddie extends GameAgent
             if at target and target is open -> find a new target
          */
 
+        if(this.route !== undefined)
+        {
+            //pull off the head of the route and go to that
+
+            let dist0 = this.currentTarget.toVector2().distance(this.logicalPosition);
+
+            let temp = this.logicalPosition.clone();
+            temp.x += this.velocity.x;
+            temp.y += this.velocity.y;
+            let dist1 = this.currentTarget.toVector2().distance(temp);
+
+            if(dist1 >= dist0)
+            {
+                this.logicalPosition = this.currentTarget.toVector2();
+
+                if(this.route.length > 0)
+                {
+                    let next_node = this.route.shift();
+
+                    this.currentTarget = next_node.clone();
+
+                    let speed = model.get_BPM_as_ticks()*this.beats_per_cell;
+                    this.velocity = new Vector2();
+                    this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
+                    this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
+                    return;
+                }
+                else
+                {
+                    //at final destination
+                    this.route = undefined;
+                    this.target = undefined;
+                    this.canMove = false;
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+
+
         if(this.target === undefined)
         {
-            if(baddieManager.get_movement_target(this) === true)
+            if (baddieManager.get_movement_target(this) === true)
             {
-                this.pathAgent.Init(this.currentCell(), this.target);
-                return;
+                try
+                {
+                    this.pathAgent.init(this.currentCell(), this.target);
+                }
+                catch(e)
+                {
+                    console.log('');
+                }
+
+                if (this.pathAgent.canReachTarget() === false)
+                {
+                    //still path finding
+                    this.canMove = false;
+                    return;
+                }
             }
         }
 
         if(this.target !== undefined)
         {
-            if(this.pathAgent.canReachTarget() === false)
+            //move to target
+            this.canMove = true;
+            this.route = this.pathAgent.GetRoute();
+            //get rid of starting node
+            if(this.route !== false)
             {
-                //still path finding
+                this.route.shift();
+
+                this.currentTarget = this.route.shift().clone();
+                let speed = model.get_BPM_as_ticks() * this.beats_per_cell; // bpm as ticks
+                this.velocity = new Vector2();
+                this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
+                this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
             }
             else
             {
-                //move to target
+                this.route = undefined;
+                this.target = undefined;
+                this.canMove = false;
             }
         }
     }
@@ -702,13 +799,29 @@ class Model
 
         this.player.update();
 
-        this.tickCount += 1;
+        this.tickCount += this.get_BPM_quanta();
     }
 
     isBeat()
     {
-        //console.log(''+this.tickCount +' ' +this.tickCount % 60);
-        return ((this.tickCount % 60) === 0);
+        return Math.floor(this.tickCount+this.get_BPM_quanta()) > Math.floor(this.tickCount);
+    }
+
+    getBPM()
+    {
+        return 130;
+    }
+
+    get_BPM_quanta()
+    {
+        return 1000.0/this.get_BPM_as_ticks();
+    }
+
+    get_BPM_as_ticks()
+    {
+        let fps = 60;
+
+        return fps / (this.getBPM() /60);
     }
 
 
@@ -753,6 +866,39 @@ class Model
         if(y > 11)  return false;
 
         return true;
+    }
+
+    get_obstacle_for_baddie(baddie)
+    {
+        for(let i = 0 ; i< this.obstacles.length;i++)
+        {
+            for(let j = 0; j < this.obstacles[i].cover.length;j++)
+            {
+                if(this.obstacles[i].cover[j]['owner'] === baddie)
+                {
+                    return this.obstacles[i].cover[j]['mapcell'];
+                }
+            }
+        }
+
+        return undefined;
+    }
+
+    free_obstacle(mapcell)
+    {
+        for(let i = 0 ; i< this.obstacles.length;i++)
+        {
+            for(let j = 0; j < this.obstacles[i].cover.length;j++)
+            {
+                if(this.obstacles[i].cover[j]['mapcell'].Equals(mapcell))
+                {
+                    this.obstacles[i].cover[j]['owner'] = undefined;
+                    return;
+                }
+            }
+        }
+
+        throw 'mapcell not in obstacle';
     }
 
     get_free_obstacle_cover(mapcell)

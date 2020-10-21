@@ -89,7 +89,7 @@ class PathAgent
         this.Reset();
     }
 
-    Init(start, target)
+    init(start, target)
     {
         if ( (this.owner.IsValidCell(target) == false)
             ||(start.Equals(target) == true)
@@ -99,10 +99,12 @@ class PathAgent
             return;
         }
 
-        if ( (this.target === undefined)
-            ||(this.target.Equals(target) == false)
-            ||(this.pathRoute.Count == 0)
-            ||(this.pathRoute[0].Equals(start) == false)
+        if ( (target === undefined)
+           ||(start === undefined)
+           ||(this.target === undefined)
+           ||(this.target.Equals(target) == false)
+           ||(this.pathRoute.length == 0)
+           ||(this.pathRoute[0].Equals(start) == false)
         )
         {
             this.Reset(); // clear out any old routing
@@ -157,7 +159,7 @@ class PathAgent
     {
         if (start != this.target)
         {
-            this.Init(start, this.target);
+            this.init(start, this.target);
         }
         else
         {
@@ -216,6 +218,11 @@ class PathAgent
     
     update()
     {
+        if(this.target === undefined)
+        {
+            return;
+        }
+
         for (let i = 0; i < 10; i++)
         {
             if (this.owner.currentCell().Equals(this.target) === false)
@@ -287,7 +294,9 @@ class PathAgent
     {
         let route = [];
     
-        if (this.owner.currentCell().Equals(this.target) === true)
+        if( (this.target === undefined)
+          ||(this.owner.currentCell().Equals(this.target) === true)
+        )
         {
             return undefined;
         }
@@ -327,8 +336,7 @@ class BaddieManager
         {
             if(model.isBeat() === true)
             {
-                console.log('beat:' + model.tickCount/60);
-                if(model.baddies.length < 1)
+                if(model.baddies.length < 5)
                 {
                     if(model.spawnpoints[i].IsValidCell(model.spawnpoints[i].currentCell() ) === true)
                     {
@@ -359,7 +367,14 @@ class BaddieManager
     get_movement_target(baddie)
     {
         //find an empty target if one exists
+
+        let current_loc = model.get_obstacle_for_baddie(baddie);
         let target = model.get_free_obstacle_cover(baddie.currentCell() );
+
+        if(current_loc !== undefined)
+        {
+            model.free_obstacle(current_loc);
+        }
 
         if(target !== undefined)
         {
