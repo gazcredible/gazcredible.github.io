@@ -36,6 +36,11 @@ class MapCell extends IVector2
         this.owner = -1;
     }
 
+    clone()
+    {
+        return new MapCell(this.x,this.y);
+    }
+
     toString()
     {
         return ''+ this.x +':'+this.y;
@@ -55,6 +60,95 @@ function logical_to_drawing_postion_from_mapcell(mapcell)
 {
     return logical_to_drawing_postion(mapcell.x,mapcell.y);
 }
+
+class Heatmap
+{
+    constructor()
+    {
+    }
+
+    init(width, height)
+    {
+        this.grid = new Array()
+
+        for(let y = 0; y < height;y++)
+        {
+            let row = new Array();
+
+            this.grid.push(row);
+
+            for(let x = 0;x < width;x++)
+            {
+                row.push(false);
+            }
+        }
+    }
+
+    update()
+    {
+        let ob = [];
+
+        for (let i = 0; i < model.obstacles.length; i++)
+        {
+            let pc = new PolyCollider();
+
+            let pos = model.obstacles[i].logicalPosition.clone();
+
+            let edges = [];
+            edges.push(new Vector2(pos.x, pos.y));
+            edges.push(new Vector2(pos.x + 1, pos.y));
+            edges.push(new Vector2(pos.x + 1, pos.y + 1));
+            edges.push(new Vector2(pos.x, pos.y + 1));
+
+            pc.init(edges);
+            ob.push(pc);
+        }
+        for (let y = 0; y < this.grid.length; y++)
+        {
+            for (let x = 0; x < this.grid[y].length; x++)
+            {
+                let lc = new LineCollider();
+                lc.init(x + 0.5, y + 0.5, model.player.logicalPosition.x + 0.5, model.player.logicalPosition.y + 0.5);
+
+                let pos0 = logical_to_drawing_postion(lc.linelist[0].x0, lc.linelist[0].y0);
+                let pos1 = logical_to_drawing_postion(lc.linelist[0].x1, lc.linelist[0].y1);
+
+                this.grid[y][x] = false;
+                for (let c = 0; c < ob.length; c++)
+                {
+                    if (lc.collides(ob[c]))
+                    {
+                        this.grid[y][x] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    draw()
+    {
+        for (let y = 0; y < this.grid.length; y++)
+        {
+            for (let x = 0; x < this.grid[y].length; x++)
+            {
+                if (this.grid[y][x])
+                {
+                    let pos = logical_to_drawing_postion(x,y);
+                    let rect =  new Rect(pos[0],pos[1],MapCell_Size-1,MapCell_Size-1)
+                    //GAZCanvas.Text(12, collision.toString(), rect.getCentre(),'#ffffff','centre');
+
+                    GAZCanvas.Rect(rect, '#7f0000', false, 3);
+                }
+            }
+        }
+    }
+
+    isVisibleToPlayer(mapcell)
+    {
+        return this.grid[mapcell.y][mapcell.x];
+    }
+}
+
 
 class NavGrid
 {
@@ -96,7 +190,15 @@ class NavGrid
                 {
                     GAZCanvas.Rect(rect, '#7f0000', true, 1);
                 }
-                GAZCanvas.Text(12, this.getCell(x,y).toString(), rect.getCentre(),'#ffffff','centre');
+
+
+                let colour = '#ffffff';
+                if(model.heatmap.isVisibleToPlayer(this.grid[y][x]) === true)
+                {
+                    colour = '#7f0000';
+                }
+
+                GAZCanvas.Text(12, this.getCell(x,y).toString(), rect.getCentre(),colour,'centre');
             }
         }
 
@@ -122,9 +224,8 @@ let global_ID = 1;
 
 class GameObject
 {
-    constructor(model)
+    constructor()
     {
-        this.model = model;
         this.logicalPosition = new Vector2(0,0);
         this.ID = global_ID;
         global_ID += 1;
@@ -147,9 +248,9 @@ class GameObject
         if(cell.x > 19)  return false;
         if(cell.y > 11)  return false;
 
-        for(let i=0;i< this.model.obstacles.length;i++)
+        for(let i=0;i< model.obstacles.length;i++)
         {
-            if(cell.Equals(this.model.obstacles[i].currentCell()) === true)
+            if(cell.Equals(model.obstacles[i].currentCell()) === true)
             {
                 return false;
             }
@@ -173,7 +274,7 @@ class GameObject
         this.logicalPosition.x = mapcell.x;
         this.logicalPosition.y = mapcell.y;
 
-        this.model.setOwner(this,mapcell);
+        model.setOwner(this,mapcell);
     }
 
     currentCell()
@@ -184,14 +285,30 @@ class GameObject
 
 class GameObstacle extends GameObject
 {
-    constructor(model)
+    constructor()
     {
-        super(model);
+        super();
+
+        this.cover = []
     }
 
     setFromMapCell(mapcell)
     {
         super.setFromMapCell(mapcell);
+
+        let cover_points = [[0,-1],[-1,0],[1,0],[0,1]];
+
+        for(let i=0;i< cover_points.length;i++)
+        {
+            let pos = mapcell.clone();
+            pos.x += cover_points[i][0];
+            pos.y += cover_points[i][1];
+
+            if(model.isValidLocation(pos.x,pos.y))
+            {
+                this.cover.push(pos);
+            }
+        }
     }
 
     draw()
@@ -199,15 +316,30 @@ class GameObstacle extends GameObject
         super.draw()
         let pos = logical_to_drawing_postion_from_mapcell(this.currentCell());
         let rect =  new Rect(pos[0]+2,pos[1]+2,MapCell_Size-4,MapCell_Size-4)
-        GAZCanvas.Rect(rect,'#ffff00',true);
+        GAZCanvas.Rect(rect,'#7f7f7f',true);
+
+        let cover_size = 16;
+        for(let i=0;i<this.cover.length;i++)
+        {
+            pos = logical_to_drawing_postion_from_mapcell(this.cover[i]);
+            rect =  new Rect(pos[0]+((MapCell_Size - cover_size)/2),pos[1]+((MapCell_Size - cover_size)/2),cover_size,cover_size);
+
+            let colour = '#7f7f7f'
+            if(model.heatmap.isVisibleToPlayer(this.cover[i]) == true)
+            {
+                colour = '#7f0000';
+            }
+
+            GAZCanvas.Rect(rect, colour, true);
+        }
     }
 }
 
 class GameAgent extends GameObject
 {
-    constructor(model)
+    constructor()
     {
-        super(model);
+        super();
         //TBD
         this.pathAgent = new PathAgent(this);
         this.pathAgent.use4wayList = true;
@@ -278,9 +410,9 @@ class GameAgent extends GameObject
 
 class Player extends GameObject
 {
-    constructor(model)
+    constructor()
     {
-        super(model);
+        super();
         this.size = 16;
     }
 
@@ -313,10 +445,9 @@ class Player extends GameObject
             new_pos.y = this.logicalPosition.y + 0.1;
         }
 
-        //if((new_pos.x !== this.logicalPosition.x) || (new_pos.y !== this.logicalPosition.y))
+        if((new_pos.x !== this.logicalPosition.x) || (new_pos.y !== this.logicalPosition.y))
         {
-            console.log(''+ new_pos.x +':'+new_pos.y);
-            if(this.model.isValidLocation(new_pos.x, new_pos.y) && this.canMoveTo(new_pos.x, new_pos.y)===true)
+            if(model.isValidLocation(new_pos.x, new_pos.y) && this.canMoveTo(new_pos.x, new_pos.y)===true)
             {
                 //work out the upto 4 cells the player is interacting with and take them out
                 let cells = {};
@@ -331,7 +462,7 @@ class Player extends GameObject
                     if(pos in cells == false)
                     {
                         cells[pos] = pos;
-                        this.model.removeOwner(this, pos);
+                        model.removeOwner(this, pos);
                     }
                 }
 
@@ -351,7 +482,7 @@ class Player extends GameObject
                     if(pos in cells == false)
                     {
                         cells[pos] = pos;
-                        this.model.setOwner(this, pos);
+                        model.setOwner(this, pos);
                     }
                 }
             }
@@ -386,13 +517,10 @@ class Player extends GameObject
 
         playercollider.init(edges);
 
-        for(let i=0;i< this.model.obstacles.length;i++)
+        for(let i=0;i< model.obstacles.length;i++)
         {
-            this.model.obstacles[i].logicalPosition.clone();
-
             let obscollider = new PolyCollider();
-
-            pos =  this.model.obstacles[i].logicalPosition.clone();
+            pos =  model.obstacles[i].logicalPosition.clone();
 
             edges = [];
             edges.push(new Vector2(pos.x+0,pos.y+0));
@@ -420,11 +548,13 @@ class Model
         this.obstacles = [];
         this.baddies = [];
         this.player = undefined;
+        this.heatmap = new Heatmap();
     }
 
     init()
     {
         this.navgrid.init(20,12);
+        this.heatmap.init(20,12);
 
         this.obstacles = [];
 
@@ -446,16 +576,18 @@ class Model
 
         this.baddies = [];
 
-        let baddie = new GameAgent(this);
+        let baddie = new GameAgent();
         baddie.setFromMapCell(new MapCell(0,0));
         this.baddies.push(baddie);
 
-        this.player = new Player(this);
+        this.player = new Player();
         this.player.setFromMapCell(new MapCell(10,6));
     }
 
     update()
     {
+        this.heatmap.update();
+
         for(let i=0;i< this.baddies.length;i++)
         {
             this.baddies[i].update();
@@ -469,6 +601,7 @@ class Model
         this.player.update();
     }
 
+
     draw()
     {
         this.navgrid.draw();
@@ -479,69 +612,10 @@ class Model
 
         for(let i=0;i< this.obstacles.length;i++)
         {
-            //this.obstacles[i].draw();
+            this.obstacles[i].draw();
         }
 
         this.player.draw();
-
-        let ob = [];
-
-        for(let i=0;i< this.obstacles.length;i++)
-        {
-            let pc = new PolyCollider();
-
-            let pos =  this.obstacles[i].logicalPosition.clone();
-
-            let edges = [];
-            edges.push(new Vector2(pos.x,pos.y));
-            edges.push(new Vector2(pos.x+1,pos.y));
-            edges.push(new Vector2(pos.x+1,pos.y+1));
-            edges.push(new Vector2(pos.x,pos.y+1));
-
-            pc.init(edges);
-            ob.push(pc);
-        }
-
-        for(let y=0;y<this.navgrid.grid.length; y++)
-        {
-            for(let x=0;x < this.navgrid.grid[y].length;x++)
-            {
-                let lc = new LineCollider();
-                lc.init(x+0.5, y+0.5, this.player.logicalPosition.x+0.5, this.player.logicalPosition.y+0.5);
-
-                let pos0 = logical_to_drawing_postion(lc.linelist[0].x0,lc.linelist[0].y0);
-                let pos1 = logical_to_drawing_postion(lc.linelist[0].x1,lc.linelist[0].y1);
-
-                let collision = false;
-                for(let c=0;c<ob.length;c++)
-                {
-                    if(lc.collides(ob[c]))
-                    {
-                        collision = true;
-                    }
-                }
-
-                if(collision === false)
-                {
-                    //GAZCanvas.Line(new Vector2(pos0[0], pos0[1]), new Vector2(pos1[0], pos1[1]),'#00ff00',2);
-                }
-                else
-                {
-                   // GAZCanvas.Line(new Vector2(pos0[0], pos0[1]), new Vector2(pos1[0], pos1[1]),'#ff0000',2);
-                }
-
-
-                let pos = logical_to_drawing_postion(x,y);
-                let rect =  new Rect(pos[0],pos[1],MapCell_Size-1,MapCell_Size-1)
-                //GAZCanvas.Text(12, collision.toString(), rect.getCentre(),'#ffffff','centre');
-
-                if(collision === true)
-                {
-                    GAZCanvas.Rect(rect, '#7f0000', false, 3);
-                }
-            }
-        }
-
     }
 
     setOwner(owner,mapcell)
@@ -571,6 +645,8 @@ class Model
         return true;
     }
 }
+
+let model = new Model();
 
 /*
 what do I want to do?

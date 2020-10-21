@@ -51,8 +51,7 @@ class Game
         this.mouseOldPos = new Vector2();
         this.mousePos = new Vector2();
 
-        this.model = new Model();
-        this.model.init();
+        model.init();
     }
 
     oneTimeInit()
@@ -116,7 +115,7 @@ class Game
         }
 
         //do game logic
-        this.model.update();
+        model.update();
     }
 
     drawScene()
@@ -125,7 +124,7 @@ class Game
 
         Canvas.ctx().imageSmoothingEnabled = false;
 
-        this.model.draw();
+        model.draw();
 
         if(this.debug_mode == true)
         {
