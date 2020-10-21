@@ -14,6 +14,12 @@ class IVector2
         }
     }
 
+    set(souce)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
     Equals(target)
     {
         return ((this.x === target.x) && (this.y === target.y));
@@ -23,6 +29,11 @@ class IVector2
     {
         this.x = source.x;
         this.y = source.y;
+    }
+
+    distance(source)
+    {
+        return Math.sqrt( Math.pow(this.x-source.x,2) + Math.pow(this.y - source.y,2));
     }
 }
 
@@ -113,12 +124,12 @@ class Heatmap
                 let pos0 = logical_to_drawing_postion(lc.linelist[0].x0, lc.linelist[0].y0);
                 let pos1 = logical_to_drawing_postion(lc.linelist[0].x1, lc.linelist[0].y1);
 
-                this.grid[y][x] = false;
+                this.grid[y][x] = true; // visible to player
                 for (let c = 0; c < ob.length; c++)
                 {
                     if (lc.collides(ob[c]))
                     {
-                        this.grid[y][x] = true;
+                        this.grid[y][x] = false; //player view hits collider
                     }
                 }
             }
@@ -193,7 +204,7 @@ class NavGrid
 
 
                 let colour = '#ffffff';
-                if(model.heatmap.isVisibleToPlayer(this.grid[y][x]) === true)
+                if(model.heatmap.isVisibleToPlayer(this.grid[y][x]) === false)
                 {
                     colour = '#7f0000';
                 }
@@ -306,7 +317,10 @@ class GameObstacle extends GameObject
 
             if(model.isValidLocation(pos.x,pos.y))
             {
-                this.cover.push(pos);
+                let data = {}
+                data['mapcell'] = pos;
+                data['owner'] = undefined;
+                this.cover.push(data);
             }
         }
     }
@@ -321,11 +335,11 @@ class GameObstacle extends GameObject
         let cover_size = 16;
         for(let i=0;i<this.cover.length;i++)
         {
-            pos = logical_to_drawing_postion_from_mapcell(this.cover[i]);
+            pos = logical_to_drawing_postion_from_mapcell(this.cover[i]['mapcell']);
             rect =  new Rect(pos[0]+((MapCell_Size - cover_size)/2),pos[1]+((MapCell_Size - cover_size)/2),cover_size,cover_size);
 
             let colour = '#7f7f7f'
-            if(model.heatmap.isVisibleToPlayer(this.cover[i]) == true)
+            if(model.heatmap.isVisibleToPlayer(this.cover[i]['mapcell']) == false)
             {
                 colour = '#7f0000';
             }
@@ -341,15 +355,11 @@ class GameAgent extends GameObject
     {
         super();
         //TBD
-        this.pathAgent = new PathAgent(this);
-        this.pathAgent.use4wayList = true;
-        this.pathAgent.Init(this.currentCell(), new MapCell(19,11));
     }
 
     update()
     {
         super.update();
-        this.pathAgent.update();
     }
 
     draw()
@@ -363,26 +373,6 @@ class GameAgent extends GameObject
 
         let rect =  new Rect(pos[0],pos[1],baddie_size,baddie_size)
         GAZCanvas.Rect(rect,'#ff0000',true);
-
-        let route = this.pathAgent.GetRoute();
-
-        if(route !== undefined)
-        {
-            for(let i=0;i< route.length-1;i++)
-            {
-                let pos0 = logical_to_drawing_postion(route[i].x,route[i].y);
-
-                pos0[0] += ((MapCell_Size)/2);
-                pos0[1] += ((MapCell_Size)/2);
-
-                let pos1 = logical_to_drawing_postion(route[i+1].x,route[i+1].y);
-
-                pos1[0] += ((MapCell_Size)/2);
-                pos1[1] += ((MapCell_Size)/2);
-
-                GAZCanvas.Line(new Vector2(pos0[0], pos0[1]),new Vector2(pos1[0], pos1[1]),'#ff0000',2);
-            }
-        }
     }
 
     IsValidCell(cell)
@@ -540,6 +530,102 @@ class Player extends GameObject
     }
 }
 
+class Baddie extends GameAgent
+{
+    constructor()
+    {
+        super();
+
+        this.target = undefined;
+    }
+
+    init(mapcell)
+    {
+        this.pathAgent = new PathAgent(this);
+        this.pathAgent.use4wayList = true;
+        //this.pathAgent.Init(this.currentCell(), new MapCell(19,11));
+
+        this.logicalPosition.x = mapcell.x;
+        this.logicalPosition.y = mapcell.y;
+    }
+
+    update()
+    {
+        super.update();
+        if(this.pathAgent.canReachTarget() === false)
+        {
+            this.pathAgent.update();
+        }
+    }
+
+    decideWhatToDo()
+    {
+        //this gets called on each beat
+
+        /*
+            if you don't have a target, get one
+            if you target isn't valid get a new target
+            if routefinding is in proces -> wait til it's done
+
+            if at target and target is open -> find a new target
+         */
+
+        if(this.target === undefined)
+        {
+            if(baddieManager.get_movement_target(this) === true)
+            {
+                this.pathAgent.Init(this.currentCell(), this.target);
+                return;
+            }
+        }
+
+        if(this.target !== undefined)
+        {
+            if(this.pathAgent.canReachTarget() === false)
+            {
+                //still path finding
+            }
+            else
+            {
+                //move to target
+            }
+        }
+    }
+
+    draw()
+    {
+        super.draw();
+
+        let route = this.pathAgent.GetRoute();
+
+        if(route !== undefined)
+        {
+            for(let i=0;i< route.length-1;i++)
+            {
+                let pos0 = logical_to_drawing_postion(route[i].x,route[i].y);
+
+                pos0[0] += ((MapCell_Size)/2);
+                pos0[1] += ((MapCell_Size)/2);
+
+                let pos1 = logical_to_drawing_postion(route[i+1].x,route[i+1].y);
+
+                pos1[0] += ((MapCell_Size)/2);
+                pos1[1] += ((MapCell_Size)/2);
+
+                GAZCanvas.Line(new Vector2(pos0[0], pos0[1]),new Vector2(pos1[0], pos1[1]),'#ff0000',2);
+            }
+        }
+    }
+}
+
+class SpawnPoint extends GameObject
+{
+    constructor()
+    {
+        super();
+    }
+}
+
 class Model
 {
     constructor()
@@ -549,6 +635,8 @@ class Model
         this.baddies = [];
         this.player = undefined;
         this.heatmap = new Heatmap();
+
+        this.tickCount = 0;
     }
 
     init()
@@ -576,12 +664,26 @@ class Model
 
         this.baddies = [];
 
-        let baddie = new GameAgent();
-        baddie.setFromMapCell(new MapCell(0,0));
-        this.baddies.push(baddie);
+        this.spawnpoints = [];
+
+        let spawnPoint = new SpawnPoint();
+        spawnPoint.setFromMapCell(new MapCell(1,1));
+        baddieManager.add_spawnpoint(spawnPoint);
+        this.spawnpoints.push(spawnPoint);
+
+        //let baddie = new GameAgent();
+        //baddie.setFromMapCell(new MapCell(0,0));
+        //this.baddies.push(baddie);
 
         this.player = new Player();
         this.player.setFromMapCell(new MapCell(10,6));
+
+        this.tickCount = 0;
+    }
+
+    addBaddie(baddie)
+    {
+        this.baddies.push(baddie);
     }
 
     update()
@@ -599,6 +701,14 @@ class Model
         }
 
         this.player.update();
+
+        this.tickCount += 1;
+    }
+
+    isBeat()
+    {
+        //console.log(''+this.tickCount +' ' +this.tickCount % 60);
+        return ((this.tickCount % 60) === 0);
     }
 
 
@@ -643,6 +753,33 @@ class Model
         if(y > 11)  return false;
 
         return true;
+    }
+
+    get_free_obstacle_cover(mapcell)
+    {
+        let best_dist = Number.MAX_VALUE;
+        let best_spot = undefined;
+
+        for(let i = 0 ; i< this.obstacles.length;i++)
+        {
+            for(let j = 0; j < this.obstacles[i].cover.length;j++)
+            {
+                if( (this.obstacles[i].cover[j]['owner'] === undefined)
+                  &&(this.heatmap.isVisibleToPlayer(this.obstacles[i].cover[j]['mapcell']) === false)
+                  )
+                {
+                    let dist = mapcell.distance(this.obstacles[i].cover[j]['mapcell']);
+
+                    if(dist < best_dist)
+                    {
+                        best_dist = dist;
+                        best_spot = this.obstacles[i].cover[j];
+                    }
+                }
+            }
+        }
+
+        return best_spot;
     }
 }
 

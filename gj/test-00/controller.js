@@ -308,3 +308,72 @@ class PathAgent
         return route.reverse();
     }
 }
+
+
+class BaddieManager
+{
+    constructor()
+    {
+    }
+
+    add_spawnpoint(spawnPoint)
+    {
+
+    }
+
+    update()
+    {
+        for (let i = 0; i< model.spawnpoints.length;i++)
+        {
+            if(model.isBeat() === true)
+            {
+                console.log('beat:' + model.tickCount/60);
+                if(model.baddies.length < 1)
+                {
+                    if(model.spawnpoints[i].IsValidCell(model.spawnpoints[i].currentCell() ) === true)
+                    {
+                        //place new baddie
+                        let baddie = new Baddie();
+                        baddie.init(model.spawnpoints[i].currentCell());
+                        model.addBaddie(baddie);
+
+                        baddie.decideWhatToDo();
+                    }
+                }
+            }
+        }
+
+        for(let i=0;i< model.baddies.length;i++)
+        {
+            if(model.isBeat() === true)
+            {
+                // do something beat-y
+                model.baddies[i].decideWhatToDo();
+            }
+
+            //whatever
+            model.baddies[i].update();
+        }
+    }
+
+    get_movement_target(baddie)
+    {
+        //find an empty target if one exists
+        let target = model.get_free_obstacle_cover(baddie.currentCell() );
+
+        if(target !== undefined)
+        {
+            target['owner'] = baddie;
+            baddie.target = target['mapcell'].clone();
+            return true;
+        }
+        else
+        {
+            baddie.target = undefined;
+        }
+
+        return false;
+    }
+}
+
+baddieManager = new BaddieManager();
