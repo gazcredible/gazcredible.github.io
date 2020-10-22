@@ -223,7 +223,9 @@ class PathAgent
             return;
         }
 
-        for (let i = 0; i < 10; i++)
+        let update_step = 2;
+
+        for (let i = 0; i < update_step; i++)
         {
             if (this.owner.currentCell().Equals(this.target) === false)
             {

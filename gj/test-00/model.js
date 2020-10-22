@@ -220,7 +220,7 @@ class NavGrid
                 let colour = '#ffffff';
                 if(model.heatmap.isVisibleToPlayer(this.grid[y][x]) === false)
                 {
-                    colour = '#7f0000';
+                    colour = '#00ff00';
                 }
 
                 GAZCanvas.Text(12, this.getCell(x,y).toString(), rect.getCentre(),colour,'centre');
@@ -346,7 +346,7 @@ class GameObstacle extends GameObject
         let rect =  new Rect(pos[0]+2,pos[1]+2,MapCell_Size-4,MapCell_Size-4)
         GAZCanvas.Rect(rect,'#7f7f7f',true);
 
-        let cover_size = 16;
+        let cover_size = 8;
         for(let i=0;i<this.cover.length;i++)
         {
             pos = logical_to_drawing_postion_from_mapcell(this.cover[i]['mapcell']);
@@ -355,7 +355,7 @@ class GameObstacle extends GameObject
             let colour = '#7f7f7f'
             if(model.heatmap.isVisibleToPlayer(this.cover[i]['mapcell']) == false)
             {
-                colour = '#7f0000';
+                colour = '#00ff00';
             }
 
             GAZCanvas.Rect(rect, colour, true);
@@ -552,6 +552,8 @@ class Baddie extends GameAgent
 
         this.target = undefined;
         this.velocity = new Vector2();
+
+        this.state = ''
     }
 
     init(mapcell)
@@ -568,124 +570,162 @@ class Baddie extends GameAgent
 
         this.route = undefined;
         this.beats_per_cell = 1;
+
+        this.state = 'goto_cover';
     }
 
     update()
     {
         super.update();
 
-        if(this.canMove === true)
+        if (this.state === 'goto_cover')
         {
-            this.logicalPosition.x += this.velocity.x;
-            this.logicalPosition.y += this.velocity.y;
-        }
-        else
-        {
-            if (this.pathAgent.canReachTarget() === false)
+            if (this.canMove === true)
+            {
+                this.logicalPosition.x += this.velocity.x;
+                this.logicalPosition.y += this.velocity.y;
+            }
+            else
             {
                 this.pathAgent.update();
+
+                if(this.currentCell().Equals(this.pathAgent.target) === true)
+                {
+                    this.resetPlanning();
+                }
             }
+
+            return;
         }
+
+        if(this.state === 'in_cover')
+        {
+            this.state = 'in_cover';
+            return;
+        }
+    }
+
+    resetPlanning()
+    {
+        this.route = undefined;
+        this.target = undefined;
+        this.canMove = false;
     }
 
     decideWhatToDo()
     {
-        //this gets called on each beat
-
-        /*
-            if you don't have a target, get one
-            if you target isn't valid get a new target
-            if routefinding is in proces -> wait til it's done
-
-            if at target and target is open -> find a new target
-         */
-
-        if(this.route !== undefined)
+        if(this.state === 'in_cover')
         {
-            //pull off the head of the route and go to that
-
-            let dist0 = this.currentTarget.toVector2().distance(this.logicalPosition);
-
-            let temp = this.logicalPosition.clone();
-            temp.x += this.velocity.x;
-            temp.y += this.velocity.y;
-            let dist1 = this.currentTarget.toVector2().distance(temp);
-
-            if(dist1 >= dist0)
+            let cell = this.currentCell();
+            if(model.heatmap.isVisibleToPlayer(cell) === true)
             {
-                this.logicalPosition = this.currentTarget.toVector2();
+                this.state = 'goto_cover';
+            }
 
-                if(this.route.length > 0)
+            return;
+        }
+
+        if (this.state === 'goto_cover')
+        {
+            if (this.route !== undefined)
+            {
+                //pull off the head of the route and go to that
+
+                let dist0 = this.currentTarget.toVector2().distance(this.logicalPosition);
+
+                let temp = this.logicalPosition.clone();
+                temp.x += this.velocity.x;
+                temp.y += this.velocity.y;
+                let dist1 = this.currentTarget.toVector2().distance(temp);
+
+                if (dist1 >= dist0)
                 {
-                    let next_node = this.route.shift();
+                    this.logicalPosition = this.currentTarget.toVector2();
 
-                    this.currentTarget = next_node.clone();
+                    if (this.route.length > 0)
+                    {
+                        let next_node = this.route.shift();
 
-                    let speed = model.get_BPM_as_ticks()*this.beats_per_cell;
-                    this.velocity = new Vector2();
-                    this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
-                    this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
-                    return;
+                        this.currentTarget = next_node.clone();
+
+                        let speed = model.get_BPM_as_ticks() * this.beats_per_cell;
+                        this.velocity = new Vector2();
+                        this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
+                        this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
+                        return;
+                    }
+                    else
+                    {
+                        //at final destination
+                        this.route = undefined;
+                        this.target = undefined;
+                        this.canMove = false;
+
+                        this.state = 'in_cover';
+                        return;
+                    }
                 }
                 else
                 {
-                    //at final destination
-                    this.route = undefined;
-                    this.target = undefined;
-                    this.canMove = false;
-                }
-            }
-            else
-            {
-                return;
-            }
-        }
-
-
-        if(this.target === undefined)
-        {
-            if (baddieManager.get_movement_target(this) === true)
-            {
-                try
-                {
-                    this.pathAgent.init(this.currentCell(), this.target);
-                }
-                catch(e)
-                {
-                    console.log('');
-                }
-
-                if (this.pathAgent.canReachTarget() === false)
-                {
-                    //still path finding
-                    this.canMove = false;
                     return;
                 }
             }
-        }
 
-        if(this.target !== undefined)
-        {
-            //move to target
-            this.canMove = true;
-            this.route = this.pathAgent.GetRoute();
-            //get rid of starting node
-            if(this.route !== false)
-            {
-                this.route.shift();
 
-                this.currentTarget = this.route.shift().clone();
-                let speed = model.get_BPM_as_ticks() * this.beats_per_cell; // bpm as ticks
-                this.velocity = new Vector2();
-                this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
-                this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
-            }
-            else
+            if (this.target === undefined)
             {
-                this.route = undefined;
-                this.target = undefined;
-                this.canMove = false;
+                if (baddieManager.get_movement_target(this) === true)
+                {
+                    try
+                    {
+                        this.pathAgent.init(this.currentCell(), this.target);
+                    } catch (e)
+                    {
+                        console.log('');
+                    }
+
+                    if (this.pathAgent.canReachTarget() === false)
+                    {
+                        //still path finding
+                        this.canMove = false;
+                        return;
+                    }
+                }
             }
+
+            if (this.target !== undefined)
+            {
+                //move to target
+                if (this.pathAgent.canReachTarget() === true)
+                {
+                    this.canMove = true;
+                    this.route = this.pathAgent.GetRoute();
+                    //get rid of starting node
+                    if (this.route !== false)
+                    {
+                        this.route.shift();
+
+                        this.currentTarget = this.route.shift().clone();
+                        let speed = model.get_BPM_as_ticks() * this.beats_per_cell; // bpm as ticks
+                        this.velocity = new Vector2();
+                        this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
+                        this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
+                    }
+                    else
+                    {
+                        this.route = undefined;
+                        this.target = undefined;
+                        this.canMove = false;
+                    }
+                }
+                else
+                {
+                    //do more route prep ....
+                    return;
+                }
+            }
+
+            return;
         }
     }
 
@@ -809,7 +849,7 @@ class Model
 
     getBPM()
     {
-        return 130;
+        return 57;
     }
 
     get_BPM_quanta()
