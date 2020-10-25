@@ -325,6 +325,7 @@ class BaddieManager
 {
     constructor()
     {
+        this.max_baddie_count = 5;
     }
 
     add_spawnpoint(spawnPoint)
@@ -334,39 +335,41 @@ class BaddieManager
 
     update()
     {
-        for (let i = 0; i< model.spawnpoints.length;i++)
+        if(model.sim_active === true)
         {
-            if(model.isBeat() === true)
+            for (let i = 0; i < model.spawnpoints.length; i++)
             {
-                if(model.baddies.length < 5)
+                if (model.isBeat() === true)
                 {
-                    if(model.spawnpoints[i].IsValidCell(model.spawnpoints[i].currentCell() ) === true)
+                    if (model.baddies.length < this.max_baddie_count)
                     {
-                        //place new baddie
-                        let baddie = new Baddie();
-                        baddie.init(model.spawnpoints[i].currentCell());
-                        model.addBaddie(baddie);
+                        if (model.spawnpoints[i].IsValidCell(model.spawnpoints[i].currentCell()) === true)
+                        {
+                            //place new baddie
+                            let baddie = new Baddie();
+                            baddie.init(model.spawnpoints[i].currentCell());
+                            model.addBaddie(baddie);
 
-                        baddie.decideWhatToDo();
+                            baddie.decideWhatToDo();
+                        }
                     }
                 }
             }
-        }
 
-        for(let i=0;i< model.baddies.length;i++)
-        {
-            if(model.isBeat() === true)
+            for (let i = 0; i < model.baddies.length; i++)
             {
-                // do something beat-y
-                model.baddies[i].decideWhatToDo();
-            }
-            else
-            {
-                console.log('');
-            }
+                if (model.isBeat() === true)
+                {
+                    // do something beat-y
+                    model.baddies[i].decideWhatToDo();
+                }
+                else
+                {
+                }
 
-            //whatever
-            model.baddies[i].update();
+                //whatever
+                model.baddies[i].update(model.time_since_last_update());
+            }
         }
     }
 

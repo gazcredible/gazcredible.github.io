@@ -394,7 +394,7 @@ class GameAgent extends GameObject
             color = '#ffffff';
         }
 
-        GAZCanvas.Rect(rect,color,true);
+       GAZCanvas.Rect(rect,color,true);
     }
 
     IsValidCell(cell)
@@ -552,216 +552,6 @@ class Player extends GameObject
     }
 }
 
-class Baddie extends GameAgent
-{
-    constructor()
-    {
-        super();
-
-        this.target = undefined;
-        this.velocity = new Vector2();
-
-        this.state = ''
-    }
-
-    init(mapcell)
-    {
-        this.pathAgent = new PathAgent(this);
-        this.pathAgent.use4wayList = true;
-        //this.pathAgent.Init(this.currentCell(), new MapCell(19,11));
-
-        this.logicalPosition.x = mapcell.x;
-        this.logicalPosition.y = mapcell.y;
-
-        this.canMove = false;
-        this.currentTarget = undefined;
-
-        this.route = undefined;
-        this.beats_per_cell = 1;
-
-        this.state = 'goto_cover';
-    }
-
-    update()
-    {
-        super.update();
-
-        if (this.state === 'goto_cover')
-        {
-            if (this.canMove === true)
-            {
-                this.logicalPosition.x += this.velocity.x;
-                this.logicalPosition.y += this.velocity.y;
-            }
-            else
-            {
-                this.pathAgent.update();
-
-                if(this.currentCell().Equals(this.pathAgent.target) === true)
-                {
-                    this.resetPlanning();
-                }
-            }
-
-            return;
-        }
-
-        if(this.state === 'in_cover')
-        {
-            this.state = 'in_cover';
-            return;
-        }
-    }
-
-    resetPlanning()
-    {
-        this.route = undefined;
-        this.target = undefined;
-        this.canMove = false;
-    }
-
-    decideWhatToDo()
-    {
-        if(this.state === 'in_cover')
-        {
-            let cell = this.currentCell();
-            if(model.heatmap.isVisibleToPlayer(cell) === true)
-            {
-                this.state = 'goto_cover';
-            }
-
-            return;
-        }
-
-        if (this.state === 'goto_cover')
-        {
-            if (this.route !== undefined)
-            {
-                //pull off the head of the route and go to that
-
-                let dist0 = this.currentTarget.toVector2().distance(this.logicalPosition);
-
-                let temp = this.logicalPosition.clone();
-                temp.x += this.velocity.x;
-                temp.y += this.velocity.y;
-                let dist1 = this.currentTarget.toVector2().distance(temp);
-
-                if (dist1 >= dist0)
-                {
-                    this.logicalPosition = this.currentTarget.toVector2();
-
-                    if (this.route.length > 0)
-                    {
-                        let next_node = this.route.shift();
-
-                        this.currentTarget = next_node.clone();
-
-                        let speed = model.get_BPM_as_ticks() * this.beats_per_cell;
-                        this.velocity = new Vector2();
-                        this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
-                        this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
-                        return;
-                    }
-                    else
-                    {
-                        //at final destination
-                        this.route = undefined;
-                        this.target = undefined;
-                        this.canMove = false;
-
-                        this.state = 'in_cover';
-                        return;
-                    }
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-
-            if (this.target === undefined)
-            {
-                if (baddieManager.get_movement_target(this) === true)
-                {
-                    try
-                    {
-                        this.pathAgent.init(this.currentCell(), this.target);
-                    } catch (e)
-                    {
-                        console.log('');
-                    }
-
-                    if (this.pathAgent.canReachTarget() === false)
-                    {
-                        //still path finding
-                        this.canMove = false;
-                        return;
-                    }
-                }
-            }
-
-            if (this.target !== undefined)
-            {
-                //move to target
-                if (this.pathAgent.canReachTarget() === true)
-                {
-                    this.canMove = true;
-                    this.route = this.pathAgent.GetRoute();
-                    //get rid of starting node
-                    if (this.route !== false)
-                    {
-                        this.route.shift();
-
-                        this.currentTarget = this.route.shift().clone();
-                        let speed = model.get_BPM_as_ticks() * this.beats_per_cell; // bpm as ticks
-                        this.velocity = new Vector2();
-                        this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
-                        this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
-                    }
-                    else
-                    {
-                        this.route = undefined;
-                        this.target = undefined;
-                        this.canMove = false;
-                    }
-                }
-                else
-                {
-                    //do more route prep ....
-                    return;
-                }
-            }
-
-            return;
-        }
-    }
-
-    draw()
-    {
-        super.draw();
-
-        let route = this.pathAgent.GetRoute();
-
-        if(route !== undefined)
-        {
-            for(let i=0;i< route.length-1;i++)
-            {
-                let pos0 = logical_to_drawing_postion(route[i].x,route[i].y);
-
-                pos0[0] += ((MapCell_Size)/2);
-                pos0[1] += ((MapCell_Size)/2);
-
-                let pos1 = logical_to_drawing_postion(route[i+1].x,route[i+1].y);
-
-                pos1[0] += ((MapCell_Size)/2);
-                pos1[1] += ((MapCell_Size)/2);
-
-                GAZCanvas.Line(new Vector2(pos0[0], pos0[1]),new Vector2(pos1[0], pos1[1]),'#ff0000',2);
-            }
-        }
-    }
-}
 
 class SpawnPoint extends GameObject
 {
@@ -781,7 +571,18 @@ class Model
         this.player = undefined;
         this.heatmap = new Heatmap();
 
-        this.tickCount = 0;
+        this.elapsed_time = 0;
+        this.previous_beat_time = 0;
+        this.step = 0;
+
+        this.audio_context=0;
+        this.masterVolume=0;
+
+        this.sim_active = false;
+
+        this.last_frame_time = 0;
+        this.current_frame_time = 0;
+        this.frame_time = 0;
     }
 
     init()
@@ -825,7 +626,7 @@ class Model
 
         this.tickCount = 0;
 
-        this.oldTime = 0;
+        this.previous_beat_time = 0;
         this.step = 0;
 
         this.audio_context=0;
@@ -845,17 +646,38 @@ class Model
 
     update()
     {
+        this.beat = false;
+
         if(Input.currentMouseState === INPUT_PRESSED)
         {
             this.audio_context.resume();
+            this.sim_active = true;
         }
 
-        this.heatmap.update();
 
-        for(let i=0;i< this.baddies.length;i++)
+        if(this.sim_active === true)
         {
-            this.baddies[i].update();
+            this.last_frame_time = this.current_frame_time;
+            this.current_frame_time = this.audio_context.currentTime;
+            this.frame_time = this.current_frame_time - this.last_frame_time;
+
+            this.elapsed_time = this.current_frame_time - this.previous_beat_time;
+
+            if (this.elapsed_time > this.get_beat_time())
+            {
+                //a beat (step) has occured
+                this.previous_beat_time += this.elapsed_time;
+
+                this.step = (this.step) % 4;
+                this.step += 1;
+
+                if (this.step == 1)
+                {
+                    this.beat = true;
+                }
+            }
         }
+        this.heatmap.update();
 
         for(let i=0;i< this.obstacles.length;i++)
         {
@@ -863,23 +685,11 @@ class Model
         }
 
         this.player.update();
-        this.beat = false;
+    }
 
-        let now = this.audio_context.currentTime;
-        let gap = now - this.oldTime;
-
-        if (gap > (60 / (this.getBPM() * 4)))
-        {
-            this.oldTime += gap;
-
-            this.step = (this.step) % 4;
-            this.step +=1;
-
-            if(this.step == 1)
-            {
-                this.beat = true;
-            }
-        }
+    time_since_last_update()
+    {
+        return this.frame_time;
     }
 
     isBeat()
@@ -887,21 +697,21 @@ class Model
         return this.beat;
     }
 
+    //time in seconds for one measure (a 1-2-3-4 beat sequence)
+    get_measure_time()
+    {
+        return 60 / this.getBPM();
+    }
+
+    //time in seconds for one beat (a 1,2,3 or 4 time)
+    get_beat_time()
+    {
+        return this.get_measure_time()/4.0; // as it's 4 beats to the bar (measure)
+    }
+
     getBPM()
     {
         return 147;
-    }
-
-    get_BPM_quanta()
-    {
-        return 1000.0/this.get_BPM_as_ticks();
-    }
-
-    get_BPM_as_ticks()
-    {
-        let fps = 60;
-
-        return fps / (this.getBPM() /60);
     }
 
 
@@ -920,14 +730,9 @@ class Model
 
         this.player.draw();
 
-        if(this.beat === true)
-        {
-            GAZCanvas.Text(20, 'beat', new Vector2(10, 20), '#ffffff', 'left');
-        }
-        else
-        {
-            GAZCanvas.Text(20, ''+this.step, new Vector2(10, 20), '#ffffff', 'left');
-        }
+        let text = ' ' + this.step + (this.beat === true? 'beat' : '');
+
+        GAZCanvas.Text(20, text, new Vector2(10, 20), '#ffffff', 'left');
     }
 
     setOwner(owner,mapcell)
