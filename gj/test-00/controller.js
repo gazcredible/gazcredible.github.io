@@ -223,7 +223,9 @@ class PathAgent
             return;
         }
 
-        for (let i = 0; i < 10; i++)
+        let update_step = 2;
+
+        for (let i = 0; i < update_step; i++)
         {
             if (this.owner.currentCell().Equals(this.target) === false)
             {
@@ -357,6 +359,10 @@ class BaddieManager
             {
                 // do something beat-y
                 model.baddies[i].decideWhatToDo();
+            }
+            else
+            {
+                console.log('');
             }
 
             //whatever

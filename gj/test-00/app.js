@@ -26,10 +26,6 @@ class Game
     {
         this.frameCount = 0;
 
-        this.audio_context=0;
-        this.masterVolume=0;
-
-
         this.drawTime = new Timer();
 
         this.current_menu = DebugMenu;
@@ -57,13 +53,6 @@ class Game
     oneTimeInit()
     {
         GAZCanvas.referenceScreenSize = new Size(1600, 900);
-
-        //set up audio and load all the samples
-        this.audio_context = new (window.AudioContext || window.webkitAudioContext)();
-
-        this.masterVolume = this.audio_context.createGain();
-        this.masterVolume.gain.value = 1.0;
-        this.masterVolume.connect(this.audio_context.destination);
     }
 
 
@@ -167,7 +156,7 @@ class Game
             //want the screen rect drawn?
             GAZCanvas.Rect(new Rect(0,0,GAZCanvas.referenceScreenSize.w,GAZCanvas.referenceScreenSize.h),'rgb(255,0,0)',false,2);
 
-        },20); //make this too small and the rendering will corrupt when moving in reverse (IDKR)
+        },16); //make this too small and the rendering will corrupt when moving in reverse (IDKR)
     }
 }
 
