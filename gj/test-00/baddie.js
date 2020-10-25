@@ -14,13 +14,13 @@ class Baddie extends GameAgent
         this.traversal_dest = new Vector2();
         this.traversal_available_time = 0;
         this.traversal_elapsed_time = 0;
+        this.t_value = 0;
     }
 
     init(mapcell)
     {
         this.pathAgent = new PathAgent(this);
         this.pathAgent.use4wayList = true;
-        //this.pathAgent.Init(this.currentCell(), new MapCell(19,11));
 
         this.logicalPosition.x = mapcell.x;
         this.logicalPosition.y = mapcell.y;
@@ -29,7 +29,7 @@ class Baddie extends GameAgent
         this.currentTarget = undefined;
 
         this.route = undefined;
-        this.measures_per_cell = 1;
+        this.measures_per_cell = 5;
 
         this.state = 'goto_cover';
 
@@ -53,31 +53,29 @@ class Baddie extends GameAgent
 
     atTraversalTarget()
     {
-        let t = this.traversal_elapsed_time / this.traversal_available_time;
-
-        return (t >= 1);
+        return (this.t_value >= 1);
     }
 
     updateTraversal(timeElapsed)
     {
         this.traversal_elapsed_time += timeElapsed;
 
-        let t = this.traversal_elapsed_time / this.traversal_available_time;
+        this.t_value = this.traversal_elapsed_time / this.traversal_available_time;
 
-        if(t > 1)
+        if(this.t_value > 1)
         {
-            t = 1;
+            this.t_value = 1;
         }
 
-        if(t< 0)
+        if(this.t_value< 0)
         {
-            t = 0;
+            this.t_value = 0;
         }
 
         //console.log('UT: '+ this.traversal_elapsed_time+ '['+ timeElapsed +']: ' +t);
 
-        this.logicalPosition.x = this.traversal_start.x + ((this.traversal_dest.x - this.traversal_start.x)*t);
-        this.logicalPosition.y = this.traversal_start.y + ((this.traversal_dest.y - this.traversal_start.y)*t);
+        this.logicalPosition.x = this.traversal_start.x + ((this.traversal_dest.x - this.traversal_start.x)*this.t_value);
+        this.logicalPosition.y = this.traversal_start.y + ((this.traversal_dest.y - this.traversal_start.y)*this.t_value);
     }
 
     update(timeElapsed)
@@ -222,8 +220,6 @@ class Baddie extends GameAgent
     {
         //super.draw();
 
-        let route = this.pathAgent.GetRoute();
-
         let color = '#ff0000';
 
         if(model.isBeat() === true)
@@ -231,16 +227,25 @@ class Baddie extends GameAgent
             color = '#ffffff';
         }
 
-        if(route !== undefined)
+        if(this.route !== undefined)
         {
-            for(let i=0;i< route.length-1;i++)
+            let actual_route = [];
+            actual_route.push(this.logicalPosition);
+            actual_route.push(this.traversal_dest);
+
+            for(let i=0;i< this.route.length;i++)
             {
-                let pos0 = logical_to_drawing_postion(route[i].x,route[i].y);
+                actual_route.push(this.route[i].toVector2());
+            }
+
+            for(let i=0;i< actual_route.length-1;i++)
+            {
+                let pos0 = logical_to_drawing_postion(actual_route[i].x,actual_route[i].y);
 
                 pos0[0] += ((MapCell_Size)/2);
                 pos0[1] += ((MapCell_Size)/2);
 
-                let pos1 = logical_to_drawing_postion(route[i+1].x,route[i+1].y);
+                let pos1 = logical_to_drawing_postion(actual_route[i+1].x,actual_route[i+1].y);
 
                 pos1[0] += ((MapCell_Size)/2);
                 pos1[1] += ((MapCell_Size)/2);
@@ -258,5 +263,12 @@ class Baddie extends GameAgent
         let rect =  new Rect(pos[0],pos[1],baddie_size,baddie_size)
 
         GAZCanvas.Rect(rect,color,true);
+
+        let pos0 = logical_to_drawing_postion(this.logicalPosition.x,this.logicalPosition.y);
+
+        let text = this.t_value.toFixed(2).toString() + ' ' + model.isBeat() + ' ' + this.state;
+
+        GAZCanvas.Text(15,text,new Vector2(pos0[0]+1,pos0[1]+1),'#000000');
+        GAZCanvas.Text(15,text,new Vector2(pos0[0],pos0[1]),'#ffffff');
     }
 }

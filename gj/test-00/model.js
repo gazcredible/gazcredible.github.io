@@ -207,23 +207,25 @@ class NavGrid
                 let pos = logical_to_drawing_postion(x,y);
                 let rect =  new Rect(pos[0],pos[1],MapCell_Size-1,MapCell_Size-1)
 
-                if(this.grid[y][x].owner === -1)
+                let color = '#000000';
+                let text_col = '#ffffff';
+
+                if(model.heatmap.isVisibleToPlayer(this.grid[y][x]) === false)
                 {
-                    GAZCanvas.Rect(rect, '#ffffff', false, 1);
+                    color = '#00ff00';
+                    text_col = '#000000';
                 }
-                else
+
+                GAZCanvas.Rect(rect, color, true, 1);
+
+                if(this.grid[y][x].owner !== -1)
                 {
                     GAZCanvas.Rect(rect, '#7f0000', true, 1);
                 }
 
+                GAZCanvas.Rect(rect, '#ffffff', false, 1);
 
-                let colour = '#ffffff';
-                if(model.heatmap.isVisibleToPlayer(this.grid[y][x]) === false)
-                {
-                    colour = '#00ff00';
-                }
-
-                GAZCanvas.Text(12, this.getCell(x,y).toString(), rect.getCentre(),colour,'centre');
+                GAZCanvas.Text(12, this.getCell(x,y).toString(), rect.getCentre(),text_col,'centre');
             }
         }
 
@@ -684,6 +686,8 @@ class Model
             this.obstacles[i].update();
         }
 
+        baddieManager.update();
+
         this.player.update();
     }
 
@@ -711,17 +715,14 @@ class Model
 
     getBPM()
     {
-        return 147;
+        //return 147;
+        return 60;
     }
 
 
     draw()
     {
         this.navgrid.draw();
-        for(let i=0;i< this.baddies.length;i++)
-        {
-            this.baddies[i].draw();
-        }
 
         for(let i=0;i< this.obstacles.length;i++)
         {
@@ -730,7 +731,12 @@ class Model
 
         this.player.draw();
 
-        let text = ' ' + this.step + (this.beat === true? 'beat' : '');
+        for(let i=0;i< this.baddies.length;i++)
+        {
+            this.baddies[i].draw();
+        }
+
+        let text = this.getBPM().toString() + ': ' + this.step + (this.beat === true? 'beat' : '');
 
         GAZCanvas.Text(20, text, new Vector2(10, 20), '#ffffff', 'left');
     }
@@ -824,9 +830,3 @@ class Model
 }
 
 let model = new Model();
-
-/*
-what do I want to do?
--space invader baddie movement
--move from cover to cover
- */

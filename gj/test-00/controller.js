@@ -337,10 +337,11 @@ class BaddieManager
     {
         if(model.sim_active === true)
         {
-            for (let i = 0; i < model.spawnpoints.length; i++)
+            if (model.isBeat() === true)
             {
-                if (model.isBeat() === true)
+                for (let i = 0; i < model.spawnpoints.length; i++)
                 {
+
                     if (model.baddies.length < this.max_baddie_count)
                     {
                         if (model.spawnpoints[i].IsValidCell(model.spawnpoints[i].currentCell()) === true)
@@ -349,8 +350,6 @@ class BaddieManager
                             let baddie = new Baddie();
                             baddie.init(model.spawnpoints[i].currentCell());
                             model.addBaddie(baddie);
-
-                            baddie.decideWhatToDo();
                         }
                     }
                 }
@@ -365,10 +364,8 @@ class BaddieManager
                 }
                 else
                 {
+                    model.baddies[i].update(model.time_since_last_update());
                 }
-
-                //whatever
-                model.baddies[i].update(model.time_since_last_update());
             }
         }
     }

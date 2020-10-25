@@ -105,7 +105,6 @@ class Game
 
         //do game logic
         model.update();
-        baddieManager.update();
     }
 
     drawScene()
