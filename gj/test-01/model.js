@@ -178,13 +178,13 @@ class Heatmap
                 {
                     if (lc.collides(ob[c]))
                     {
-                        //this.grid[y][x] = false; //player view hits collider
+                        this.grid[y][x] = false; //player view hits collider
                     }
                 }
             }
         }
 
-        //return;
+        return;
 
         for (let y = 0; y < this.grid.length; y++)
         {
@@ -199,10 +199,6 @@ class Heatmap
                     if (this.sc.isPointInMe(new Vector2(cell_edges[i][0], cell_edges[i][1])) !== true)
                     {
                         this.grid[y][x] = true;
-                    }
-                    else
-                    {
-                        console.log('point in me');
                     }
                 }
             }
@@ -226,7 +222,7 @@ class Heatmap
             }
         }
 
-        //return;
+        return;
 
         for(let i=0;i<this.sc.linelist.length;i++)
         {
@@ -267,19 +263,19 @@ class NavGrid
         }
     }
 
-    draw()
+    draw(island)
     {
         for(let y=0;y<this.grid.length; y++)
         {
             for(let x=0;x < this.grid[y].length;x++)
             {
-                let pos = logical_to_drawing_postion(x,y);
+                let pos = island.logical_to_drawing_postion(x,y);
                 let rect =  new Rect(pos[0],pos[1],MapCell_Size-1,MapCell_Size-1)
 
                 let color = '#000000';
                 let text_col = '#ffffff';
 
-                if(model.heatmap.isVisibleToPlayer(this.grid[y][x]) === false)
+                if((model.heatmap.isVisibleToPlayer(this.grid[y][x]) === false) && false)
                 {
                     color = '#00ff00';
                     text_col = '#000000';
@@ -302,7 +298,7 @@ class NavGrid
         {
             for(let x=0;x < this.grid[y].length;x+=2)
             {
-                let pos = logical_to_drawing_postion(x,y);
+                let pos = island.logical_to_drawing_postion(x,y);
                 let rect =  new Rect(pos[0],pos[1],MapCell_Size*2-1,MapCell_Size*2-1)
                 GAZCanvas.Rect(rect,'#0000ff',false,1);
             }
@@ -637,6 +633,38 @@ class SpawnPoint extends GameObject
     }
 }
 
+class Island
+{
+    constructor()
+    {
+        this.navgrid = new NavGrid();
+        this.heatmap = new Heatmap();
+        this.obstacles = [];
+        this.position = new Vector2();
+    }
+
+    init(rect)
+    {
+        this.position.x = rect.x;
+        this.position.y = rect.y;
+
+        this.navgrid.init(rect.w,rect.h);
+        this.heatmap.init(rect.w,rect.h);
+    }
+
+    draw()
+    {
+        this.navgrid.draw(this);
+        //this.heatmap.draw();
+    }
+
+    logical_to_drawing_postion(x,y)
+    {
+        return [this.position.x +(x*MapCell_Size),this.position.y+(y*MapCell_Size)];
+    }
+
+}
+
 class Model
 {
     constructor()
@@ -659,6 +687,8 @@ class Model
         this.last_frame_time = 0;
         this.current_frame_time = 0;
         this.frame_time = 0;
+
+        this.islands = {};
     }
 
     init()
@@ -667,6 +697,25 @@ class Model
         this.heatmap.init(20,12);
 
         this.obstacles = [];
+
+        this.islands = {};
+        this.islands['island-0'] = new Island();
+        this.islands['island-0'].init(new Rect(20,20, 18, 6));
+
+        this.islands['island-1'] = new Island();
+        this.islands['island-1'].init(new Rect(1200,20, 6, 12));
+
+        this.islands['island-2'] = new Island();
+        this.islands['island-2'].init(new Rect(20,20+(6*64)+10, 6, 6));
+
+        this.islands['island-3'] = new Island();
+        this.islands['island-3'].init(new Rect(20+(6*64)+10,20+(6*64)+10, 6, 2));
+
+        this.islands['island-4'] = new Island();
+        this.islands['island-4'].init(new Rect(20+(6*64)+10,20+(9*64)+42, 6, 2));
+
+        this.islands['island-5'] = new Island();
+        this.islands['island-5'].init(new Rect(20+(12*64)+20,20+(6*64)+60, 6, 6));
 
         if(true)
         {
@@ -796,6 +845,7 @@ class Model
 
     draw()
     {
+        /*
         this.navgrid.draw();
         this.heatmap.draw();
 
@@ -810,10 +860,16 @@ class Model
         {
             this.baddies[i].draw();
         }
-
+*/
         let text = this.getBPM().toString() + ': ' + this.step + (this.beat === true? 'beat' : '');
 
         GAZCanvas.Text(20, text, new Vector2(10, 20), '#ffffff', 'left');
+
+
+        for (const [key, value] of Object.entries(this.islands))
+        {
+            value.draw()
+        }
     }
 
     setOwner(owner,mapcell)
