@@ -79,7 +79,6 @@ class PathAgent
         //this.use4wayList = true;
 
         this.pathRoute = new Array();//new List<MapCell>();
-
         this.openList = new Array();//LinkedList<PathNode> ;
         this.closedList = {}; //Dictionary<MapCell,int>;
 
@@ -99,7 +98,7 @@ class PathAgent
             ||(start.Equals(target) == true)
         )
         {
-            this.Reset();
+            console.log('Can\'t RF from here');
             return;
         }
 
@@ -224,7 +223,7 @@ class PathAgent
     {
         if(this.target === undefined)
         {
-            throw 'no valid target';
+            console.log('no valid target');
 
             return;
         }

@@ -31,7 +31,7 @@ class Baddie extends GameAgent
         this.currentTarget = undefined;
 
         this.route = undefined;
-        this.measures_per_cell = 1;
+        this.beats_per_cell = 4; // set this to multiple of 4 IF working on measures (1 trigger per bar)
 
         this.state = 'goto_cover';
 
@@ -43,7 +43,7 @@ class Baddie extends GameAgent
         // this is how long to you have to get to your destination - assuming 1 measure per cell
         this.traversal_available_time = model.get_beat_time();
         // * by measures per cell so the baddie will take longer to move, i.e. have more time to move between mapcells
-        this.traversal_available_time = this.traversal_available_time * this.measures_per_cell;
+        this.traversal_available_time = this.traversal_available_time * this.beats_per_cell;
         this.traversal_start.set(starting_position);
         this.traversal_dest.set(target);
         this.traversal_elapsed_time = 0;

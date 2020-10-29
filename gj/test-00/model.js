@@ -90,6 +90,7 @@ class Heatmap
 {
     constructor()
     {
+        this.debug_stuff = {};
     }
 
     init(width, height)
@@ -163,6 +164,8 @@ class Heatmap
             ob.push(pc);
         }
 
+        this.debug_stuff = [];
+
         for (let y = 0; y < this.grid.length; y++)
         {
             for (let x = 0; x < this.grid[y].length; x++)
@@ -173,14 +176,22 @@ class Heatmap
                 let pos0 = logical_to_drawing_postion(lc.linelist[0].x0, lc.linelist[0].y0);
                 let pos1 = logical_to_drawing_postion(lc.linelist[0].x1, lc.linelist[0].y1);
 
+                let data = {};
+                data['p0'] = new Vector2(pos0[0], pos0[1]);
+                data['p1'] = new Vector2(pos1[0], pos1[1]);
+                data['col'] = '#ffffff';
+
                 this.grid[y][x] = true; // visible to player
                 for (let c = 0; c < ob.length; c++)
                 {
                     if (lc.collides(ob[c]))
                     {
                         this.grid[y][x] = false; //player view hits collider
+                        data['col'] = '#ff0000';
                     }
                 }
+
+                this.debug_stuff.push(data);
             }
         }
 
@@ -224,6 +235,13 @@ class Heatmap
                     GAZCanvas.Rect(rect, '#7f0000', false, 3);
                 }
             }
+        }
+
+        return
+
+        for (let i=0;i< this.debug_stuff.length;i++)
+        {
+            GAZCanvas.Line(this.debug_stuff[i]['p0'], this.debug_stuff[i]['p1'], this.debug_stuff[i]['col'],2 );
         }
 
         return;
@@ -747,7 +765,7 @@ class Model
                 this.step = (this.step) % 4;
                 this.step += 1;
 
-                //if (this.step === 1)
+                if (this.step === 1) // use this test IF you are triggering on measures, not beats / steps
                 {
                     this.beat = true;
                 }
