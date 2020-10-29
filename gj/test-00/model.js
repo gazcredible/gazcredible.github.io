@@ -178,13 +178,13 @@ class Heatmap
                 {
                     if (lc.collides(ob[c]))
                     {
-                        //this.grid[y][x] = false; //player view hits collider
+                        this.grid[y][x] = false; //player view hits collider
                     }
                 }
             }
         }
 
-        //return;
+        return;
 
         for (let y = 0; y < this.grid.length; y++)
         {
@@ -226,7 +226,7 @@ class Heatmap
             }
         }
 
-        //return;
+        return;
 
         for(let i=0;i<this.sc.linelist.length;i++)
         {
@@ -789,7 +789,7 @@ class Model
 
     getBPM()
     {
-        //return 147;
+        return 147;
         return 20;
     }
 

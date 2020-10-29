@@ -15,6 +15,8 @@ class Baddie extends GameAgent
         this.traversal_available_time = 0;
         this.traversal_elapsed_time = 0;
         this.t_value = 0;
+
+        this.debug_text = '';
     }
 
     init(mapcell)
@@ -82,6 +84,8 @@ class Baddie extends GameAgent
     {
         super.update();
 
+        this.debug_text += this.state;
+
         if(this.canMove === undefined)
         {
             throw 'canMove not set-up';
@@ -91,10 +95,13 @@ class Baddie extends GameAgent
         {
             if (this.canMove === true)
             {
+                this.debug_text += ' can move';
+                this.debug_text += (this.traversal_elapsed_time / this.traversal_available_time).toFixed(2);
                 this.updateTraversal(timeElapsed);
             }
             else
             {
+                this.debug_text += ' can\'t move';
                 this.pathAgent.update();
 
                 if(this.currentCell().Equals(this.pathAgent.target) === true)
@@ -124,6 +131,7 @@ class Baddie extends GameAgent
 
     decideWhatToDo()
     {
+        this.debug_text += ' decide what to do';
         if(this.state === 'in_cover')
         {
             let cell = this.currentCell();
@@ -271,9 +279,11 @@ class Baddie extends GameAgent
 
         let pos0 = logical_to_drawing_postion(this.logicalPosition.x,this.logicalPosition.y);
 
-        let text = this.t_value.toFixed(2).toString() + ' ' + model.isBeat() + ' ' + this.state;
+        let text = this.t_value.toFixed(2).toString() + ' ' + this.debug_text;
 
-        GAZCanvas.Text(15,text,new Vector2(pos0[0]+1,pos0[1]+1),'#000000');
-        GAZCanvas.Text(15,text,new Vector2(pos0[0],pos0[1]),'#ffffff');
+        GAZCanvas.Text(17,text,new Vector2(pos0[0]+1,pos0[1]+1),'#000000');
+        GAZCanvas.Text(17,text,new Vector2(pos0[0],pos0[1]),'#ffffff');
+
+        this.debug_text = '';
     }
 }

@@ -85,12 +85,16 @@ class PathAgent
 
         this.startNode = undefined; //PathNode
         this.target = undefined; //MapCell;
+        this.update_step = 20;
 
         this.Reset();
     }
 
     init(start, target)
     {
+
+        this.update_step = 20;
+
         if ( (this.owner.IsValidCell(target) == false)
             ||(start.Equals(target) == true)
         )
@@ -225,9 +229,7 @@ class PathAgent
             return;
         }
 
-        let update_step = 2;
-
-        for (let i = 0; i < update_step; i++)
+        for (let i = 0; i < this.update_step; i++)
         {
             if (this.owner.currentCell().Equals(this.target) === false)
             {
@@ -328,6 +330,8 @@ class BaddieManager
     constructor()
     {
         this.max_baddie_count = 5;
+        this.beat_delay = 10;
+        this.wait_time = 0;
     }
 
     add_spawnpoint(spawnPoint)
@@ -341,33 +345,38 @@ class BaddieManager
         {
             if (model.isBeat() === true)
             {
-                for (let i = 0; i < model.spawnpoints.length; i++)
+                if(this.wait_time === 0)
                 {
-
-                    if (model.baddies.length < this.max_baddie_count)
+                    for (let i = 0; i < model.spawnpoints.length; i++)
                     {
-                        if (model.spawnpoints[i].IsValidCell(model.spawnpoints[i].currentCell()) === true)
+                        if (model.baddies.length < this.max_baddie_count)
                         {
-                            //place new baddie
-                            let baddie = new Baddie();
-                            baddie.init(model.spawnpoints[i].currentCell());
-                            model.addBaddie(baddie);
+                            if (model.spawnpoints[i].IsValidCell(model.spawnpoints[i].currentCell()) === true)
+                            {
+                                //place new baddie
+                                let baddie = new Baddie();
+                                baddie.init(model.spawnpoints[i].currentCell());
+                                model.addBaddie(baddie);
+                            }
                         }
                     }
+
+                    this.wait_time = this.beat_delay;
+                }
+                else
+                {
+                    this.wait_time = this.wait_time-1;
+                }
+
+                for (let i = 0; i < model.baddies.length; i++)
+                {
+                    model.baddies[i].decideWhatToDo();
                 }
             }
 
             for (let i = 0; i < model.baddies.length; i++)
             {
-                if (model.isBeat() === true)
-                {
-                    // do something beat-y
-                    model.baddies[i].decideWhatToDo();
-                }
-                else
-                {
-                    model.baddies[i].update(model.time_since_last_update());
-                }
+                model.baddies[i].update(model.time_since_last_update());
             }
         }
     }
