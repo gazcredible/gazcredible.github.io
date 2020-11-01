@@ -90,7 +90,6 @@ class Heatmap
 {
     constructor()
     {
-        this.debug_stuff = {};
     }
 
     init(width, height)
@@ -164,8 +163,6 @@ class Heatmap
             ob.push(pc);
         }
 
-        this.debug_stuff = [];
-
         for (let y = 0; y < this.grid.length; y++)
         {
             for (let x = 0; x < this.grid[y].length; x++)
@@ -176,22 +173,14 @@ class Heatmap
                 let pos0 = logical_to_drawing_postion(lc.linelist[0].x0, lc.linelist[0].y0);
                 let pos1 = logical_to_drawing_postion(lc.linelist[0].x1, lc.linelist[0].y1);
 
-                let data = {};
-                data['p0'] = new Vector2(pos0[0], pos0[1]);
-                data['p1'] = new Vector2(pos1[0], pos1[1]);
-                data['col'] = '#ffffff';
-
                 this.grid[y][x] = true; // visible to player
                 for (let c = 0; c < ob.length; c++)
                 {
                     if (lc.collides(ob[c]))
                     {
                         this.grid[y][x] = false; //player view hits collider
-                        data['col'] = '#ff0000';
                     }
                 }
-
-                this.debug_stuff.push(data);
             }
         }
 
@@ -210,10 +199,6 @@ class Heatmap
                     if (this.sc.isPointInMe(new Vector2(cell_edges[i][0], cell_edges[i][1])) !== true)
                     {
                         this.grid[y][x] = true;
-                    }
-                    else
-                    {
-                        console.log('point in me');
                     }
                 }
             }
@@ -235,13 +220,6 @@ class Heatmap
                     GAZCanvas.Rect(rect, '#7f0000', false, 3);
                 }
             }
-        }
-
-        return
-
-        for (let i=0;i< this.debug_stuff.length;i++)
-        {
-            GAZCanvas.Line(this.debug_stuff[i]['p0'], this.debug_stuff[i]['p1'], this.debug_stuff[i]['col'],2 );
         }
 
         return;
@@ -285,19 +263,19 @@ class NavGrid
         }
     }
 
-    draw()
+    draw(island)
     {
         for(let y=0;y<this.grid.length; y++)
         {
             for(let x=0;x < this.grid[y].length;x++)
             {
-                let pos = logical_to_drawing_postion(x,y);
+                let pos = island.logical_to_drawing_postion(x,y);
                 let rect =  new Rect(pos[0],pos[1],MapCell_Size-1,MapCell_Size-1)
 
                 let color = '#000000';
                 let text_col = '#ffffff';
 
-                if(model.heatmap.isVisibleToPlayer(this.grid[y][x]) === false)
+                if((model.heatmap.isVisibleToPlayer(this.grid[y][x]) === false) && false)
                 {
                     color = '#00ff00';
                     text_col = '#000000';
@@ -307,8 +285,10 @@ class NavGrid
 
                 if(this.grid[y][x].owner !== -1)
                 {
-                    colour = '#00ff00';
-                }              
+                    GAZCanvas.Rect(rect, '#7f0000', true, 1);
+                }
+
+                GAZCanvas.Rect(rect, '#ffffff', false, 1);
 
                 GAZCanvas.Text(12, this.getCell(x,y).toString(), rect.getCentre(),text_col,'centre');
             }
@@ -318,7 +298,7 @@ class NavGrid
         {
             for(let x=0;x < this.grid[y].length;x+=2)
             {
-                let pos = logical_to_drawing_postion(x,y);
+                let pos = island.logical_to_drawing_postion(x,y);
                 let rect =  new Rect(pos[0],pos[1],MapCell_Size*2-1,MapCell_Size*2-1)
                 GAZCanvas.Rect(rect,'#0000ff',false,1);
             }
@@ -645,217 +625,44 @@ class Player extends GameObject
 }
 
 
-        this.target = undefined;
-        this.velocity = new Vector2();
-
-        this.state = ''
-    }
-
-    init(mapcell)
-    {
-        this.pathAgent = new PathAgent(this);
-        this.pathAgent.use4wayList = true;
-        //this.pathAgent.Init(this.currentCell(), new MapCell(19,11));
-
-        this.logicalPosition.x = mapcell.x;
-        this.logicalPosition.y = mapcell.y;
-
-        this.canMove = false;
-        this.currentTarget = undefined;
-
-        this.route = undefined;
-        this.beats_per_cell = 1;
-
-        this.state = 'goto_cover';
-    }
-
-    update()
-    {
-        super.update();
-
-        if (this.state === 'goto_cover')
-        {
-            if (this.canMove === true)
-            {
-                this.logicalPosition.x += this.velocity.x;
-                this.logicalPosition.y += this.velocity.y;
-            }
-            else
-            {
-                this.pathAgent.update();
-
-                if(this.currentCell().Equals(this.pathAgent.target) === true)
-                {
-                    this.resetPlanning();
-                }
-            }
-
-            return;
-        }
-
-        if(this.state === 'in_cover')
-        {
-            this.state = 'in_cover';
-            return;
-        }
-    }
-
-    resetPlanning()
-    {
-        this.route = undefined;
-        this.target = undefined;
-        this.canMove = false;
-    }
-
-    decideWhatToDo()
-    {
-        if(this.state === 'in_cover')
-        {
-            let cell = this.currentCell();
-            if(model.heatmap.isVisibleToPlayer(cell) === true)
-            {
-                this.state = 'goto_cover';
-            }
-
-            return;
-        }
-
-        if (this.state === 'goto_cover')
-        {
-            if (this.route !== undefined)
-            {
-                //pull off the head of the route and go to that
-
-                let dist0 = this.currentTarget.toVector2().distance(this.logicalPosition);
-
-                let temp = this.logicalPosition.clone();
-                temp.x += this.velocity.x;
-                temp.y += this.velocity.y;
-                let dist1 = this.currentTarget.toVector2().distance(temp);
-
-                if (dist1 >= dist0)
-                {
-                    this.logicalPosition = this.currentTarget.toVector2();
-
-                    if (this.route.length > 0)
-                    {
-                        let next_node = this.route.shift();
-
-                        this.currentTarget = next_node.clone();
-
-                        let speed = model.get_BPM_as_ticks() * this.beats_per_cell;
-                        this.velocity = new Vector2();
-                        this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
-                        this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
-                        return;
-                    }
-                    else
-                    {
-                        //at final destination
-                        this.route = undefined;
-                        this.target = undefined;
-                        this.canMove = false;
-
-                        this.state = 'in_cover';
-                        return;
-                    }
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-
-            if (this.target === undefined)
-            {
-                if (baddieManager.get_movement_target(this) === true)
-                {
-                    try
-                    {
-                        this.pathAgent.init(this.currentCell(), this.target);
-                    } catch (e)
-                    {
-                        console.log('');
-                    }
-
-                    if (this.pathAgent.canReachTarget() === false)
-                    {
-                        //still path finding
-                        this.canMove = false;
-                        return;
-                    }
-                }
-            }
-
-            if (this.target !== undefined)
-            {
-                //move to target
-                if (this.pathAgent.canReachTarget() === true)
-                {
-                    this.canMove = true;
-                    this.route = this.pathAgent.GetRoute();
-                    //get rid of starting node
-                    if (this.route !== false)
-                    {
-                        this.route.shift();
-
-                        this.currentTarget = this.route.shift().clone();
-                        let speed = model.get_BPM_as_ticks() * this.beats_per_cell; // bpm as ticks
-                        this.velocity = new Vector2();
-                        this.velocity.x = (this.currentTarget.x - this.logicalPosition.x) / speed;
-                        this.velocity.y = (this.currentTarget.y - this.logicalPosition.y) / speed;
-                    }
-                    else
-                    {
-                        this.route = undefined;
-                        this.target = undefined;
-                        this.canMove = false;
-                    }
-                }
-                else
-                {
-                    //do more route prep ....
-                    return;
-                }
-            }
-
-            return;
-        }
-    }
-
-    draw()
-    {
-        super.draw();
-
-        let route = this.pathAgent.GetRoute();
-
-        if(route !== undefined)
-        {
-            for(let i=0;i< route.length-1;i++)
-            {
-                let pos0 = logical_to_drawing_postion(route[i].x,route[i].y);
-
-                pos0[0] += ((MapCell_Size)/2);
-                pos0[1] += ((MapCell_Size)/2);
-
-                let pos1 = logical_to_drawing_postion(route[i+1].x,route[i+1].y);
-
-                pos1[0] += ((MapCell_Size)/2);
-                pos1[1] += ((MapCell_Size)/2);
-
-                GAZCanvas.Line(new Vector2(pos0[0], pos0[1]),new Vector2(pos1[0], pos1[1]),'#ff0000',2);
-            }
-        }
-    }
-}
-
 class SpawnPoint extends GameObject
 {
     constructor()
     {
         super();
     }
+}
+
+class Island
+{
+    constructor()
+    {
+        this.navgrid = new NavGrid();
+        this.heatmap = new Heatmap();
+        this.obstacles = [];
+        this.position = new Vector2();
+    }
+
+    init(rect)
+    {
+        this.position.x = rect.x;
+        this.position.y = rect.y;
+
+        this.navgrid.init(rect.w,rect.h);
+        this.heatmap.init(rect.w,rect.h);
+    }
+
+    draw()
+    {
+        this.navgrid.draw(this);
+        //this.heatmap.draw();
+    }
+
+    logical_to_drawing_postion(x,y)
+    {
+        return [this.position.x +(x*MapCell_Size),this.position.y+(y*MapCell_Size)];
+    }
+
 }
 
 class Model
@@ -880,6 +687,8 @@ class Model
         this.last_frame_time = 0;
         this.current_frame_time = 0;
         this.frame_time = 0;
+
+        this.islands = {};
     }
 
     init()
@@ -888,6 +697,25 @@ class Model
         this.heatmap.init(20,12);
 
         this.obstacles = [];
+
+        this.islands = {};
+        this.islands['island-0'] = new Island();
+        this.islands['island-0'].init(new Rect(20,20, 18, 6));
+
+        this.islands['island-1'] = new Island();
+        this.islands['island-1'].init(new Rect(1200,20, 6, 12));
+
+        this.islands['island-2'] = new Island();
+        this.islands['island-2'].init(new Rect(20,20+(6*64)+10, 6, 6));
+
+        this.islands['island-3'] = new Island();
+        this.islands['island-3'].init(new Rect(20+(6*64)+10,20+(6*64)+10, 6, 2));
+
+        this.islands['island-4'] = new Island();
+        this.islands['island-4'].init(new Rect(20+(6*64)+10,20+(9*64)+42, 6, 2));
+
+        this.islands['island-5'] = new Island();
+        this.islands['island-5'].init(new Rect(20+(12*64)+20,20+(6*64)+60, 6, 6));
 
         if(true)
         {
@@ -968,7 +796,7 @@ class Model
                 this.step = (this.step) % 4;
                 this.step += 1;
 
-                if (this.step === 1) // use this test IF you are triggering on measures, not beats / steps
+                //if (this.step === 1)
                 {
                     this.beat = true;
                 }
@@ -999,7 +827,7 @@ class Model
     //time in seconds for one measure (a 1-2-3-4 beat sequence)
     get_measure_time()
     {
-        return 57;
+        return 60 / this.getBPM();
     }
 
     //time in seconds for one beat (a 1,2,3 or 4 time)
@@ -1010,13 +838,14 @@ class Model
 
     getBPM()
     {
-        return 147;
+        //return 147;
         return 20;
     }
 
 
     draw()
     {
+        /*
         this.navgrid.draw();
         this.heatmap.draw();
 
@@ -1031,10 +860,16 @@ class Model
         {
             this.baddies[i].draw();
         }
-
+*/
         let text = this.getBPM().toString() + ': ' + this.step + (this.beat === true? 'beat' : '');
 
         GAZCanvas.Text(20, text, new Vector2(10, 20), '#ffffff', 'left');
+
+
+        for (const [key, value] of Object.entries(this.islands))
+        {
+            value.draw()
+        }
     }
 
     setOwner(owner,mapcell)
