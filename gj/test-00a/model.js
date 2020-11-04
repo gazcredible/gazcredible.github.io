@@ -765,7 +765,7 @@ class Model
                 this.step = (this.step) % 4;
                 this.step += 1;
 
-                if (this.step === 1) // use this test IF you are triggering on measures, not beats / steps
+                //if (this.step === 1) // use this test IF you are triggering on measures, not beats / steps
                 {
                     this.beat = true;
                 }
@@ -778,7 +778,7 @@ class Model
             this.obstacles[i].update();
         }
 
-        baddieManager.update(this.time_since_last_update());
+        baddieManager.update();
 
         this.player.update();
     }

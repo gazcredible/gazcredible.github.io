@@ -31,18 +31,9 @@ class Baddie extends GameAgent
         this.currentTarget = undefined;
 
         this.route = undefined;
-        this.beats_per_cell = 4; // set this to multiple of 4 IF working on measures (1 trigger per bar)
+        this.beats_per_cell = 1; // set this to multiple of 4 IF working on measures (1 trigger per bar)
 
         this.state = 'goto_cover';
-
-
-    }
-
-    resetPlanning()
-    {
-        this.route = undefined;
-        this.target = undefined;
-        this.canMove = false;
 
 
     }
@@ -123,6 +114,15 @@ class Baddie extends GameAgent
             this.state = 'in_cover';
             return;
         }
+    }
+
+    resetPlanning()
+    {
+        this.route = undefined;
+        this.target = undefined;
+        this.canMove = false;
+
+
     }
 
     decideWhatToDo()

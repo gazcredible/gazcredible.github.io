@@ -338,7 +338,7 @@ class BaddieManager
 
     }
 
-    update(timeElapsed)
+    update()
     {
         if(model.sim_active === true)
         {
@@ -375,7 +375,7 @@ class BaddieManager
 
             for (let i = 0; i < model.baddies.length; i++)
             {
-                model.baddies[i].update(timeElapsed);
+                model.baddies[i].update(model.time_since_last_update());
             }
         }
     }
