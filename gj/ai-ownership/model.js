@@ -359,7 +359,7 @@ class Model
 
     getBPM()
     {
-        return 147;
+        //return 147;
         return 20;
     }
 
