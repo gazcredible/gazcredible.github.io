@@ -42,7 +42,7 @@ class GameState_Test extends StateMachineState
         this.timeBase = new Date();
         this.lastTime =this.timeBase.getTime();
         
-        this.timeStep = 250;
+        this.timeStep = 100;
     }
     
     init()
@@ -128,6 +128,9 @@ class GameState_Test extends StateMachineState
         super.draw();
     
         GAZCanvas.Rect(new Rect(0,0,1600,900),'#000000');
+
+        let w = 1600/this.width;
+        let h = 900/this.height;
     
         for (var x = 0; x < this.width; x++)
         {
@@ -135,9 +138,7 @@ class GameState_Test extends StateMachineState
             {
                 if(this.frames[this.source][x][y] == true)
                 {
-                    var w = 1600/this.width;
-                    var h = 900/this.height;
-                    
+
                     GAZCanvas.Rect(new Rect(x *w, y *h, w-1, h-1),'#ffffff');
                 }
             }

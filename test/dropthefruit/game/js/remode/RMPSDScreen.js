@@ -318,9 +318,6 @@ RMPSDScreen.prototype	=
     isContentLoaded:function()
     {
         if(this.layerCount == 0) return false;
-        
-        var success = true;
-        var missingCount = 0;
 
         for(var key in this.layerBank)
         {
@@ -333,26 +330,14 @@ RMPSDScreen.prototype	=
                   &&(value.image.width == 0)
                   )
                 {
-                    success = false;
-    
-                    missingCount++;
+                    return false;
                 }
             }catch(e)
             {
             }
         }
-        
-        if(success == false)
-        {
-            console.log(missingCount + " are missing");
-        }
-        
-        if(missingCount == 33)
-        {
-            return true;
-        }
 
-        return success;
+        return true;
     },
 
     getUserEventsEnabled:function()
