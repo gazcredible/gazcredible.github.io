@@ -53,7 +53,7 @@ DTFGame.prototype.update=function()
                         if(moreGamesButton.isInMe(gMouseState.GLPosition) == true)
                         {
                             //gRMPlatform.openNewTab("http://www.zibbo.com/");
-                            GameAPI.Branding.getLink('more_games').action();
+                            //GameAPI.Branding.getLink('more_games').action();
                         }
                     }
                 }
