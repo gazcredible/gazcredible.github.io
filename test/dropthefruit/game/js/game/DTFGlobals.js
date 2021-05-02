@@ -1,1 +1,14 @@
-No Content: http://www8.agame.com/mirror/html5/d/DropTheFruit/DropTheFruit_moregames_action/DropTheFruit_moregames_action/game/js/game/DTFGlobals.js
+var gFailLevel = false;
+var gLotsofBalls = false;
+var gShowColliders = false;
+var gShowBallTrajectory = true;
+var gDisableVan = false;
+var gAudioTest = false;
+var gEnableAudio = true;
+var gAudioMute = false;
+var gGameTextLabels = false;
+var gMakeAllLevelsAvailable = false;
+var gDebugInfo = false;
+
+var gAdamBackgroundScrollTime = 30;
+var glevelover_ScrollTime = 30;
