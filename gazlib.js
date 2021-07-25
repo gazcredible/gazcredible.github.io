@@ -1,3 +1,51 @@
+class Random
+{
+    constructor(value)
+    {
+       this.seed = 0;
+       this.currentValue = 0;
+
+        this.init(value);
+    }
+
+    init(value)
+    {
+        this.seed = value;
+        this.currentValue = this.seed;
+    }
+
+    next()
+    {
+        this.currentValue += this.seed;
+        this.currentValue ^= 353562;
+
+        return this.currentValue;
+    }
+
+    reset()
+    {
+        this.currentValue = this.seed;
+    }
+
+    getInt(min, max)
+    {
+        if (min == max) return min;
+
+        var val = this.next() % 10000;
+
+        return Math.floor(((val / 10000.0) * (max - min)) + min);
+    }
+
+    getFloat(min, max)
+    {
+        if (min == max) return min;
+
+        var val = this.next() % 10000;
+
+        return (((val / 10000.0) * (max - min)) + min);
+    }
+}
+
 //vector2
 class Vector2
 {
@@ -476,6 +524,8 @@ class CircularCollider
     }
 }
 
+Matrix_Identity = new Matrix();
+
 //rectcollider
 class RectCollider extends Rect
 {
@@ -508,6 +558,373 @@ class RectCollider extends Rect
         return true;
     }
 }
+
+class ParametricLine
+{
+    constructor()
+    {
+        this.x0=0;
+        this.x1=0;
+        this.y0=0;
+        this.y1=0;
+    }
+
+    init(start, end)
+    {
+        this.x0 = start.x;
+        this.y0 = start.y;
+
+        this.x1 = end.x;
+        this.y1 = end.y;
+    }
+
+    getIntercept(line, intercept)
+    {
+        if ((line.x0 < Math.min(this.x0,this.x1)) && (line.x1 < Math.min(this.x0,this.x1))) return false;
+        if ((line.x0 > Math.max(this.x0, this.x1)) && (line.x1 > Math.max(this.x0, this.x1))) return false;
+
+        if ((line.y0 < Math.min(this.y0, this.y1)) && (line.y1 < Math.min(this.y0, this.y1))) return false;
+        if ((line.y0 > Math.max(this.y0, this.y1)) && (line.y1 > Math.max(this.y0, this.y1))) return false;
+
+        intercept.x = 0;
+        intercept.y = 0;
+
+        var a = this.x0;
+        var c = this.x1 - this.x0;
+        var d = line.x0;
+        var f = line.x1 - line.x0;
+        var g = this.y0;
+        var h = this.y1 - this.y0;
+        var i = line.y0;
+        var j = line.y1 - line.y0;
+        var k = ((j * c) - (f * h));
+
+        if(Math.abs(k) < 0.001)	return false;
+
+        var t = ((j * (d - a)) + (f * (g - i))) / k;
+
+        if (t > 1 || t < 0) return false;
+
+        intercept.x = this.x0 + t * (this.x1 - this.x0);
+        intercept.y = this.y0 + t * (this.y1 - this.y0);
+
+        if (Math.abs(line.x1 - line.x0) > 0)
+        {
+            t = (intercept.x - line.x0) / (line.x1 - line.x0);
+        }
+        else
+        {
+            t = (intercept.y - line.y0) / (line.y1 - line.y0);
+        }
+
+        if (t > 1 || t < 0) return false;
+
+        return true;
+    }
+}
+
+class ColliderBase
+{
+    constructor()
+    {
+        this.worldPointList = [];
+        this.localPointList = [];
+        this.lineList = [];
+    }
+
+
+    init()
+    {
+        this.worldPointList = [];
+        this.localPointList = [];
+        this.lineList = [];
+    }
+
+    setTransform(mat)
+    {
+        this.lineList = [];
+
+        this.worldPointList= [];
+
+        for(let i = 0;i< this.localPointList.length-1;i+=2)
+        {
+            var v0 = this.localPointList[i];
+            var v1 = this.localPointList[i+1];
+
+            v0 = mat.TransformVector2(v0);
+            v1 = mat.TransformVector2(v1);
+
+            var line = new ParametricLine();
+            line.init(v0,v1);
+            this.lineList.push(line);
+
+            this.worldPointList.push(v0);
+            this.worldPointList.push(v1);
+        }
+    }
+
+    collides(obj, collisionList)
+    {
+        var bGotCollision = false;
+
+        //console.log(obj.constructor.name );
+
+        if (obj.constructor.name == ManifoldCollider.constructor.name)
+        {
+            return obj.Collides(this, collisionList);
+        }
+        else
+        {
+            var result = new Vector2(-1,-1);
+
+            for (let isrc = 0; isrc < obj.lineList.length; isrc++)
+            {
+                for (let idst = 0; idst < this.lineList.length; idst++)
+                {
+
+                    if (obj.lineList[isrc].getIntercept(this.lineList[idst], result))
+                    {
+                        if (collisionList == null)
+                        {
+                            return true;
+                        }
+
+                        collisionList.push(new Vector2(result.x,result.y));
+
+                        bGotCollision = true;
+                    }
+                }
+            }
+        }
+        return bGotCollision;
+    }
+
+    isPointInMe(pos)
+    {
+        var i = 0;
+        var j = this.worldPointList.length - 1;
+        var oddNodes = false;
+
+        for (i = 0; i < this.worldPointList.length; i++)
+        {
+            if ((this.worldPointList[i].y < pos.y && this.worldPointList[j].y >= pos.y)
+                || (this.worldPointList[j].y < pos.y && this.worldPointList[i].y >= pos.y)
+            )
+            {
+                if (this.worldPointList[i].x + (pos.y - this.worldPointList[i].y) / (this.worldPointList[j].y - this.worldPointList[i].y) * (this.worldPointList[j].x - this.worldPointList[i].x) < pos.x)
+                {
+                    oddNodes = !oddNodes;
+                }
+            }
+            j = i;
+        }
+
+        return oddNodes;
+    }
+
+    draw(col,thickness)
+    {
+        if(thickness == undefined)
+        {
+            thickness = 1;
+        }
+
+        if (this.worldPointList.Count == 0) return;
+
+        for(let i = 0;i< this.localPointList.length;i+=2)
+        {
+            var v0 = this.worldPointList[i];
+            var v1 = this.worldPointList[i+1];
+
+            GAZCanvas.Line(v0,v1,col,thickness);
+        }
+    }
+}
+
+class PolyCollider extends ColliderBase
+{
+
+    constructor()
+    {
+        super();
+    }
+
+    initFromEdgeList(edgeList)
+    {
+        super.init();
+
+        for(let i=0;i<edgeList.length;i++)
+        {
+            this.localPointList.push(edgeList[i]);
+            this.localPointList.push(edgeList[(i+1)%edgeList.length]);
+        }
+    }
+}
+
+class LineCollider extends ColliderBase
+{
+    constructor()
+    {
+        super();
+
+    }
+
+    initFromPoints(v0,v1)
+    {
+        super.init ();
+
+        this.localPointList.push(v0);
+        this.localPointList.push(v1);
+
+        this.setTransform(Matrix_Identity);
+    }
+}
+
+class CircleCollider extends PolyCollider
+{
+    initCircleCollider(radius, segments)
+    {
+        if(segments == undefined)
+        {
+            segments = 32;
+        }
+
+        super.init();
+
+        var polyList = [];
+
+        for(let i=0;i<segments;i++)
+        {
+            var rad = new Vector2(radius,0);
+            var rot = Matrix.CreateRotationZ(((2*Math.PI*i)/segments));
+
+            polyList.push(rot.TransformVector2(rad));
+        }
+
+        super.initFromEdgeList(polyList);
+    }
+}
+
+class FenceCollider extends ColliderBase
+{
+    constructor()
+    {
+        super();
+    }
+
+    initFromFence(fence)
+    {
+        super.init();
+
+        var v1 = new Vector2();
+        var v2 = new Vector2();
+
+        v1 = fence[0];
+
+        for(let i=1;i<fence.length;i++)
+        {
+            v2 = fence[i];
+            this.localPointList.push(v1);
+            this.localPointList.push(v2);
+
+            v1 = v2;
+        }
+
+        this.setTransform(Matrix_Identity);
+    }
+
+    isPointInMe(pos)
+    {
+        return false;
+    }
+}
+
+class ColliderHolder
+{
+    constructor(collider, xform)
+    {
+        this.collider = collider;
+        this.transform = xform;
+    }
+}
+
+class ManifoldCollider extends ColliderBase
+{
+    constructor()
+    {
+        super();
+        this.colliderList = [];
+    }
+
+    addCollider(collider,transform)
+    {
+        colliderList.push(new ColliderHolder(collider,transform) );
+    }
+
+
+    setTransform(mat)
+    {
+        for(let i=0;i< this.colliderList;i++)
+        {
+            this.colliderList[i].collider.setTransform(this.colliderList[i] * mat);
+        }
+    }
+
+    collides(obj, collisionList)
+    {
+        var bGotCollision = false;
+
+        for(let i=0;i< this.colliderList;i++)
+        {
+            if (this.colliderList[i].collider.Collides(obj, collisionList) == true)
+            {
+                bGotCollision = true;
+            }
+
+            if ((collisionList == null) && (bGotCollision == true))
+            {
+                return true;
+            }
+        }
+
+        return bGotCollision;
+    }
+
+    isPointInMe(pos)
+    {
+        for(let i=0;i< this.colliderList;i++)
+        {
+            if (this.colliderList[i].collider.isPointInMe(pos) == true) return true;
+        }
+
+        return false;
+    }
+
+    Draw(col)
+    {
+        for(let i=0;i< this.colliderList;i++)
+        {
+            this.colliderList[i].collider.Draw(c);
+        }
+    }
+}
+
+class RectangleCollider extends PolyCollider
+{
+    constructor(width, height)
+    {
+        super();
+
+        var polyList = [];
+        polyList.push(new Vector2(-width/2,-height/2));
+        polyList.push(new Vector2( width/2,-height/2));
+        polyList.push(new Vector2( width/2, height/2));
+        polyList.push(new Vector2(-width/2, height/2));
+
+        super.initFromEdgeList(polyList);
+    }
+}
+
 
 //keycodes
 /*
@@ -1045,9 +1462,9 @@ class gazcanvas
         this.targetSize = new Size(0,0);
     }
 
-    update()
+    update(offset = 0)
     {
-        this.currentScreenSize = new Size(window.innerWidth, window.innerHeight);
+        this.currentScreenSize = new Size(window.innerWidth, window.innerHeight-offset);
 
         Canvas.ctx().canvas.width  = this.currentScreenSize.w;
         Canvas.ctx().canvas.height = this.currentScreenSize.h;
@@ -1332,5 +1749,117 @@ class TexturePage
     DrawSpriteInfo(uvRect, pos)
     {
         GAZCanvas.Sprite(this.image, new Rect(pos.x, pos.y, uvRect.w, uvRect.h), uvRect);
+    }
+}
+
+class BitmapFont
+{
+    constructor(bitmapfile)
+    {
+        this.image = new Image();
+        this.image.src = bitmapfile;
+        this.scaleFactor = 1.0
+    }
+
+    setScale(factor)
+    {
+        this.scaleFactor = factor;
+    }
+
+    measureString(stringToPrint,size)
+    {
+        size.x = 0;
+        size.y = 8 *this.scaleFactor;
+
+        for(let i = 0; i < stringToPrint.length;i++)
+        {
+            switch(stringToPrint[i])
+            {
+                case ' ':
+                size.x += 8 * this.scaleFactor;
+                break;
+
+                case '\n':
+                return;
+
+                default:
+                    size.x +=8 * this.scaleFactor;
+                break;
+            }
+        }
+    }
+
+    applyJustificationOffset(just, size, Offset)
+    {
+        switch(just)
+        {
+            case 'left':
+                Offset.x = 0;
+                Offset.y = 0;
+                break;
+            case 'right':
+                Offset.x -= size.x;
+                break;
+
+            case 'centre':
+                Offset.x -= size.x/2;
+                break;
+
+            case 'centreXY':
+                Offset.x -= size.x/2;
+                Offset.y -= size.y/2;
+                break;
+            default:
+                Offset.x = 0;
+                Offset.y = 0;
+                break;
+        }
+    }
+
+
+    print(position, text,justify)
+    {
+        var offset = new Vector2();
+        var size = new Vector2();
+        var i=0;
+
+        this.measureString(text,size);
+        this.applyJustificationOffset(justify,size,offset);
+
+        Canvas.ctx().imageSmoothingEnabled = false;
+
+        for(let ch = 0; ch < text.length;ch++)
+        {
+            switch(text[ch])
+            {
+                case ' ':
+                    offset.x += 8 * this.scaleFactor;
+                    break;
+
+                case '\n':
+                {
+                    offset.x = 0;
+                    position.y+= 10  * this.scaleFactor;
+
+                    this.measureString(text.substring(ch+1),size);
+                    this.applyJustificationOffset(justify,size,offset);
+                }
+                    break;
+
+
+                default:
+                    let charIndex = text.charCodeAt(ch);
+
+                    GAZCanvas.Sprite(this.image
+                        ,new Rect(position.x+offset.x,position.y+offset.y, 8*this.scaleFactor, 8*this.scaleFactor)
+                        ,new Rect(Math.floor(charIndex % 16)*8, Math.floor(charIndex / 16)*8, 8,7.5)
+                    );
+
+                    offset.x +=8 * this.scaleFactor;
+                    break;
+            }
+        }
+
+        Canvas.ctx().imageSmoothingEnabled = true;
     }
 }

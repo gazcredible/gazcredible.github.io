@@ -61,28 +61,17 @@ class Heatmap
 
             pc.init(edges);
 
-            if (Input.mouseLogicalPos !== undefined)
-            {
-                let mouseInModelSpace = Input.mouseLogicalPos.clone()
-
-                mouseInModelSpace.x = (mouseInModelSpace.x - model.offset.x) / this.mapcell_size;
-                mouseInModelSpace.y = (mouseInModelSpace.y - model.offset.y) / this.mapcell_size;
-
-                if (pc.isPointInMe(mouseInModelSpace) == true)
-                {
-                    //console.log(model.last_frame_time.toString() + ' ' + i + ' mouse in me!');
-                }
-            }
             ob.push(pc);
         }
-
+        
         this.debug_stuff = [];
+
+        let lc = new LineCollider();
 
         for (let y = 0; y < this.grid.length; y++)
         {
             for (let x = 0; x < this.grid[y].length; x++)
             {
-                let lc = new LineCollider();
                 lc.init(x + 0.5, y + 0.5, model.player.logicalPosition.x + 0.5, model.player.logicalPosition.y + 0.5);
 
                 let pos0 = model.logical_to_drawing_postion(lc.linelist[0].x0, lc.linelist[0].y0);
@@ -218,6 +207,8 @@ class Model
         this.last_frame_time = 0;
         this.current_frame_time = 0;
         this.frame_time = 0;
+
+        this.heatmapTime = new Timer();
     }
 
     init()
@@ -230,9 +221,13 @@ class Model
 
         if (true)
         {
-            let cover = [[6, 3],
+            let cover = [[6, 3],[6, 4],[6, 5],[6, 6],
                 [14, 3],
-                [14, 8], [6, 8]
+                [14, 8], [6, 8],
+
+                [8,10],[9,10],[12,10],[13,10],
+
+                [15,5],[16,5],[17,5],
             ];
 
             for (let i = 0; i < cover.length; i++)
@@ -323,7 +318,10 @@ class Model
                 }
             }
         }
+
+        this.heatmapTime.start();
         this.heatmap.update(this);
+        this.heatmapTime.addFrame();
 
         for(let i=0;i< this.obstacles.length;i++)
         {

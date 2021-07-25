@@ -126,6 +126,9 @@ class Game
         }
 
         GAZCanvas.Text(40,this.drawTime.Get().toFixed(2)+'mS',new Vector2(1600,40),'#ffffff','right')
+
+        GAZCanvas.Text(20,'heatmap:' +model.heatmapTime.Get().toFixed(2)+'mS',new Vector2(1600,80),'#ffffff','right')
+
     }
 
     Run()

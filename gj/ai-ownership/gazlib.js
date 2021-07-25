@@ -1968,10 +1968,14 @@ class PolyCollider extends ColliderBase
 
 class LineCollider extends ColliderBase
 {
+    constructor()
+    {
+        super();
+        this.linelist.push(new ParametricLine());
+    }
+
     init(x0, y0, x1, y1)
     {
-        let line = new ParametricLine();
-        line.init(x0,y0,x1,y1);
-        this.linelist.push(line);
+        this.linelist[0].init(x0,y0,x1,y1);
     }
 }

@@ -116,7 +116,7 @@ class Game
         setInterval(function()
         {
             //Update GAZCanvas to keep the application reactive (the correct aspect ratio)
-            GAZCanvas.update();
+            GAZCanvas.update(60);
             
             //update input controll
             Input.update();

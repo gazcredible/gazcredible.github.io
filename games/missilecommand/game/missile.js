@@ -4,7 +4,7 @@ class MissileBase extends GameObject
     {
         super();
 
-        this.start = new Vector2()
+        this.start = new Vector2();
         this.start.set(position);
 
         this.target = new Vector2();

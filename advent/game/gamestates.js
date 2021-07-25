@@ -33,14 +33,15 @@ class GameState_Test extends StateMachineState
     
     draw()
     {
-        super.draw()
+        super.draw();
         
         GAZCanvas.Rect(new Rect(0, 0, 1600, 900),'#000000');
 
         GameInst.drawScene();
 
         let date1 = new Date(Date.now());
-        let date2 = new Date("03/07/2020");
+        //let date2 = new Date("03/07/2020");
+        let date2 = new Date("08/30/2022");
 
         let Difference_In_Time = date2.getTime() - date1.getTime();
 
@@ -53,12 +54,12 @@ class GameState_Test extends StateMachineState
 
 
 
-        GAZCanvas.Text(1000
+        GAZCanvas.Text(800
             ,Difference_In_Days
             , new Vector2(1600/2,1000/2)
             ,'#ffffff'
             ,'center'
-            ,'Archivo Black')
+            ,'Archivo Black');
 
 
         GAZCanvas.Text(50

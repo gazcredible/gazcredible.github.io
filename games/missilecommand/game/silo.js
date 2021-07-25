@@ -22,7 +22,7 @@ class silo extends GameObject
 
         this.position.set(location);
         this.active = active;
-        this.collider = new RectCollider(silo.width(),silo.height());
+        this.collider = new RectangleCollider(silo.width(),silo.height());
         this.collider.setTransform(Matrix.CreateTranslation(this.position.x, this.position.y,0));
 
         this.onLevelStart(this.active);

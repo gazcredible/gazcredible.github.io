@@ -28,7 +28,7 @@ class gazcanvas
 
     update()
     {
-        this.currentScreenSize = new Size(window.innerWidth, window.innerHeight);
+        this.currentScreenSize = new Size(window.innerWidth, window.innerHeight-60);
     
         Canvas.ctx().canvas.width  = this.currentScreenSize.w;
         Canvas.ctx().canvas.height = this.currentScreenSize.h;

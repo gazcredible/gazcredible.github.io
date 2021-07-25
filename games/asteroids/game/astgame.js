@@ -269,7 +269,7 @@ class AstGame
                                         and needs to be called at the beginning of each
                                         update()
              */
-            GAZCanvas.update();
+            GAZCanvas.update(60);
             
             /*
                 Input.update() -    Update system inputs (mouse, keyboard).

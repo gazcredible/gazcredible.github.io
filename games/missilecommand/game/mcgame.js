@@ -484,7 +484,7 @@ class mcgame
         
         setInterval(function()
         {
-            GAZCanvas.update();
+            GAZCanvas.update(60);
 
             Input.update();
             GameInst.inputEventManager.processInput();
@@ -510,3 +510,5 @@ class mcgame
 }
 
 GameInst = new mcgame();
+
+debugFont = new BitmapFont("data/font.png")

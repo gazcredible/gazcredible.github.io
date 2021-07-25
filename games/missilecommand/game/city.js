@@ -10,7 +10,7 @@ class City extends GameObject
 
         if(this.active == true)
         {
-            this.collider = new RectCollider(City.width(),City.height());
+            this.collider = new RectangleCollider(City.width(),City.height());
             this.collider.setTransform(Matrix.CreateTranslation(Location.x + City.width()/2, Location.y+ City.height()/2,0));
         }
     }

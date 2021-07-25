@@ -15,18 +15,18 @@ class GameState_Test extends StateMachineState
     
     init()
     {
-        super.init()
+        super.init();
     }
     
     update()
     {
-        super.update()
+        super.update();
         GameInst.updateScene();
     }
     
     draw()
     {
-        super.draw()
+        super.draw();
         
         GAZCanvas.Rect(new Rect(0, 0, 1600, 900),'#000000');
 

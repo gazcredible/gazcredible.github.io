@@ -87,7 +87,7 @@ class GameState_Attract extends StateMachineState
     
     draw()
     {
-        super.draw()
+        super.draw();
     
         GameInst.onDrawGame();
 
