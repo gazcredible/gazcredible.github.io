@@ -350,7 +350,7 @@ class Fretboard
         fretbaordInst.oneTimeInit();
         setInterval(function()
         {
-            GAZCanvas.update();
+            GAZCanvas.update(60);
             
             Input.update();
             
