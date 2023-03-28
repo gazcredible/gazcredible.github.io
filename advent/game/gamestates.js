@@ -54,7 +54,7 @@ class GameState_Test extends StateMachineState
 
 
 
-        GAZCanvas.Text(800
+        GAZCanvas.Text(750
             ,Difference_In_Days
             , new Vector2(1600/2,1000/2)
             ,'#ffffff'
