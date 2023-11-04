@@ -41,7 +41,7 @@ class GameState_Test extends StateMachineState
 
         let date1 = new Date(Date.now());
         //let date2 = new Date("03/07/2020");
-        let date2 = new Date("04/6/2030");
+        let date2 = new Date("10/9/2025");
 
         let Difference_In_Time = date2.getTime() - date1.getTime();
 
