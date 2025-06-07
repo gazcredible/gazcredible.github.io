@@ -227,6 +227,10 @@ collections:
     output: true
     permalink: /:collection/:path/
 
+  pub2:
+    output: true
+    permalink: /:collection/:path/
+
 
 # These settings control how pages and collections are included in the site
 defaults:

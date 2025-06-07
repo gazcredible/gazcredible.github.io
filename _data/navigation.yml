@@ -11,6 +11,11 @@ main:
   - title: "Publications"
     url: /publications/
 
+
+  - title: "Pub2"
+    url: /pub2/
+
+
   - title: "Talks"
     url: /talks/    
 
