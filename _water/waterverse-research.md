@@ -1,7 +1,7 @@
 ---
 title: "WATERVERSE"
-collection: publications
-permalink: /publications/arsinoe-research
+collection: water
+permalink: /water/arsinoe-research
 excerpt: 'This is the work I did on ARSINOE'
 
 ---

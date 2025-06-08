@@ -13,16 +13,17 @@ main:
     url: /pub2/
 
   - title: "Water Research"
-    url: /publications/
+    url: /water/
 
   - title: "Lecturing"
-    url: /talks/    
+    url: /teaching/
 
   - title: "Blog Posts"
     url: /year-archive/
     
   - title: "CV"
     url: /cv/
-    
+
+
   # - title: "CV"
   #   url: /cv-json/
