@@ -5,11 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="433c4042-bb64-4a94-9717-4b7909b9133f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/_pages/pub2.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_pub2/2009-10-01-paper-title-number-1.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_pub2/2010-10-01-paper-title-number-2.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/_config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_pub2/uz-game.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_publications/aqua3s-research.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_publications/arsinoe-research.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_publications/f4w-research.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_publications/lotus-research.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_publications/natalie-research.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_publications/waterline-research.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_publications/waterverse-research.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/_data/navigation.yml" beforeDir="false" afterPath="$PROJECT_DIR$/_data/navigation.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_includes/archive-single.html" beforeDir="false" afterPath="$PROJECT_DIR$/_includes/archive-single.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_pages/pub2.html" beforeDir="false" afterPath="$PROJECT_DIR$/_pages/pub2.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_pages/publications.html" beforeDir="false" afterPath="$PROJECT_DIR$/_pages/publications.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_portfolio/portfolio-2.html" beforeDir="false" afterPath="$PROJECT_DIR$/_portfolio/portfolio-2.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_pub2/2009-10-01-paper-title-number-1.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_pub2/2010-10-01-paper-title-number-2.md" beforeDir="false" afterPath="$PROJECT_DIR$/_pub2/wod-game.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_publications/2009-10-01-paper-title-number-1.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_publications/2010-10-01-paper-title-number-2.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_publications/2015-10-01-paper-title-number-3.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_publications/2024-02-17-paper-title-number-4.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +45,9 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="2yBSk2Y9SD3l9RTQbXNabcPjdW2" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -40,8 +58,8 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "/home/gareth/Documents/personal/gazcredible.github.io/_pages",
+    "git-widget-placeholder": "working-dev",
+    "last_opened_file_path": "/home/gareth/Documents/personal/gazcredible.github.io/_publications",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -52,6 +70,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/_publications" />
       <recent name="$PROJECT_DIR$/_pages" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/_gamedev" />
@@ -77,6 +96,7 @@
       <updated>1749306612765</updated>
       <workItem from="1749306613826" duration="4081000" />
       <workItem from="1749310705036" duration="345000" />
+      <workItem from="1749379665235" duration="1266000" />
     </task>
     <servers />
   </component>
