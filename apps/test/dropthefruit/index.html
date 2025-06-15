@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0, maximum-scale-1.0">
+
+    <title>Drop The Fruit</title>
+    <link rel="stylesheet" href="css/RMGameEngine.css"  />
+
+    <style>
+    .spilgames-branding-image{
+    display: block;
+    right: -10px;
+    top: 0px;
+    position: absolute;
+    width:120px;
+}
+#spilgames-more-games-btn {
+    color: rgb(248, 248, 248);
+    background-color: #1EAF2F;
+    border-radius: 10px;
+    padding: 10px;
+    text-decoration: none;
+}
+    </style>
+
+    <---! engine stuff --->
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMDebug.js" ></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/buzz.js" ></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/howler.js" ></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMGlobals.js" ></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMPlatform.js" ></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMGameApp.js" ></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMBitmapFont.js" ></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/spine.js" ></script>
+
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMPSDScreen.js" ></script>
+
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMDocumentHandlers.js" ></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMUtils.js" ></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMGameTimer.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMSize.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMRect.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMMouseState.js"></script>
+
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMCanvas.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMTextPrinter.js"></script>
+
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMVector2.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMGamestate.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMImageBank.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMInput.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMTransferFunction.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMCollider.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMAudioWebkit.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMBuzzAudio.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMHowlerAudio.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/remode/RMSpritesheet.js"></script>
+
+
+    <---! game stuff --->
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFGlobals.js"></script>
+    <script language="javascript" type="text/javascript" src="game/data/screen/screen.js"></script>
+    <script language="javascript" type="text/javascript" src="game/data/gametext.js"></script>
+    <script language="javascript" type="text/javascript" src="game/data/anim/dimmbro_1.js"></script>
+    <script language="javascript" type="text/javascript" src="game/data/anim/dimmbro2_left.js"></script>
+    <script language="javascript" type="text/javascript" src="game/data/anim/dimmbro2_right.js"></script>
+    <script language="javascript" type="text/javascript" src="game/data/anim/title.js"></script>
+    <script language="javascript" type="text/javascript" src="game/data/anim/leafanim.js"></script>
+    <script language="javascript" type="text/javascript" src="game/data/anim/throw.js"></script>
+
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFAudio.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFLevel.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFAnimPlayer.js"></script>
+    <script language="javascript" type="text/javascript" src="game/data/levels.js"></script>
+
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFObject.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFView.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFModel.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFController.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFGame.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/game/DTFGameStates.js"></script>
+    <script language="javascript" type="text/javascript" src="game/js/game/TFDemo.js"></script>
+
+</head>
+
+<body>
+    
+    <!-- your game code -->
+    
+    <!-- declare the 'SpilData' object and the app ID property -->
+    <!-- Load the HTML5 API -->
+
+<div id="gameWrapper" class="rmCanvasContainer" >
+    
+
+
+</body>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+</html>

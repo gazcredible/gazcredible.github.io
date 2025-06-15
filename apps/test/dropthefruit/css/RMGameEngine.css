@@ -1,0 +1,56 @@
+@charset "UTF-8";
+/* CSS Document */
+
+@font-face{
+	font-family	: 'dinreg';
+	src:url(../font/dinregu.ttf);
+}
+
+@font-face{
+	font-family	: 'dinbold';
+	src:url(../font/dinbold.ttf);
+}
+
+body,html,document{
+	margin: 0px;
+	height:100%;
+	background-color:#111;
+	overflow:hidden;
+}
+
+
+div.rmCanvasContainer{
+	position:fixed;
+	left:0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	
+}
+
+.cnvs{
+	position:absolute;
+	left: 50%;
+	top:	50%;
+}
+
+div.traceField{
+	position: absolute;
+	left: 2px; 
+	top: 2px;
+	width: 200px; 
+	height: 32px; 
+	padding: 4px; 
+}
+
+div.tmpUI{
+	color: #ffffff;
+	position:absolute;
+	left:5px;
+	bottom:30px;	
+}
+
+div.tmpUI a{
+	color : #ffffff;
+	text-decoration: none;	
+}

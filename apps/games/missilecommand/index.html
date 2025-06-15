@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Missile Command</title>
+
+    <script src="../../gazlib.js"></script>
+    <!--
+    <script src="lib/maths/random.js"></script>
+    <script src="lib/maths/vector2.js"></script>
+    <script src="lib/maths/vector3.js"></script>
+    <script src="lib/maths/vector4.js"></script>
+    <script src="lib/maths/matrix.js"></script>
+    <script src="lib/maths/rect.js"></script>
+    <script src="lib/maths/size.js"></script>
+    <script src="lib/maths/parametricline.js"></script>
+    <script src="lib/maths/colliderbase.js"></script>
+    <script src="lib/maths/linecollider.js"></script>
+    <script src="lib/maths/fencecollider.js"></script>
+    <script src="lib/maths/polycollider.js"></script>
+    <script src="lib/maths/rectcollider.js"></script>
+    <script src="lib/maths/circlecollider.js"></script>
+    <script src="lib/maths/manifoldcollider.js"></script>
+
+    <script src="lib/input/input_keycodes.js"></script>
+    <script src="lib/input/input.js"></script>
+    <script src="lib/input/inputeventmanager.js"></script>
+    <script src="lib/drawing/canvas.js"></script>
+    <script src="lib/drawing/gazcanvas.js"></script>
+    <script src="lib/drawing/bitmapfont.js"></script>
+    <script src="lib/statemachine.js"></script>
+    <script src="lib/httpclient.js"></script>
+    <script src="lib/drawing/texturepage.js"></script>
+-->
+
+    <!--game files-->
+
+    <script src="game/gameobject.js"></script>
+    <script src="game/ground.js"></script>
+    <script src="game/missile.js"></script>
+    <script src="game/explosion.js"></script>
+    <script src="game/levelmanager.js"></script>
+    <script src="game/gamestates.js"></script>
+    <script src="game/playerstats.js"></script>
+
+    <script src="game/city.js"></script>
+    <script src="game/eventmanager.js"></script>
+    <script src="game/player.js"></script>
+    <script src="game/silo.js"></script>
+
+    <script src="game/mcgame.js"></script>
+
+    <!--https://fonts.google.com/-->
+    <link href='https://fonts.googleapis.com/css?family=Archivo Black' rel='stylesheet'>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+</body>
+</html>
+
+<script>
+    document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+    document.body.scroll = "no"; // ie only
+    document.body.style.padding = 0;
+    document.body.style.margin = 0;
+
+    GameInst.Run();
+</script>

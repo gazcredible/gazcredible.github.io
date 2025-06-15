@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .container {
+            position: relative;
+        }
+
+        #text {
+            position: absolute;
+            background-color: transparent;
+            left: 0px;
+            top: 0px;
+            z-index: 10;
+        }
+    </style>
+
+
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="lib/vector2.js"></script>
+    <script src="lib/vector3.js"></script>
+    <script src="lib/vector4.js"></script>
+    <script src="lib/matrix.js"></script>
+    <script src="lib/rect.js"></script>
+    <script src="lib/input.js"></script>
+    <script src="lib/glsupport.js"></script>
+    <script src="lib/debugrenderer.js"></script>
+    <script src="lib/statemachine.js"></script>
+    <script src="lib/canvas.js"></script>
+    <script src="lib/basegame.js"></script>
+    <script src="game/demogame.js"></script>
+    <script src="game/gamestates.js"></script>
+</head>
+
+<div class="container">
+    <canvas id="glcanvas"></canvas>
+    <canvas id="text"></canvas>
+</div>
+
+<body>
+
+
+</body>
+
+<script>
+    document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+    document.body.scroll = "no"; // ie only
+    document.body.style.padding = 0;
+    document.body.style.margin = 0;
+
+    "use strict";
+    //DemoGameInst.Run(DemoGameInst);
+
+    DemoGameInst.oneTimeInit();
+    var then = 0;
+
+    let ptime = performance.now();
+
+    class Timer
+    {
+        constructor()
+        {
+            this.values = new Float32Array(60);
+            this.index = 0;
+
+        }
+
+        Add(val)
+        {
+            this.values[this.index] = val;
+            this.index = (this.index+1)% this.values.length;
+        }
+
+        Get()
+        {
+            let sum = 0;
+            for(let i=0;i<this.values.length;i++)
+            {
+                sum += this.values[i];
+            }
+
+            return sum /this.values.length;
+        }
+    }
+
+    let ltimer = new Timer();
+    let rtimer = new Timer();
+    let ftimer = new Timer();
+
+    function render(time)
+    {
+        var now = time * 0.001;
+        var deltaTime = Math.min(0.1, now - then);
+        then = now;
+
+        Input.update();
+        DemoGameInst.frameCount++;
+
+        //do state machine update
+        let ltime = performance.now();
+        DemoGameInst.stateMachine.update();
+        ltimer.Add(performance.now() - ltime);
+
+        let rtime = performance.now();
+        DemoGameInst.stateMachine.draw();
+        rtimer.Add( performance.now() - rtime);
+
+        Canvas.ctx().canvas.width  = window.innerWidth;
+        Canvas.ctx().canvas.height = window.innerHeight;
+
+        Canvas.ctx().clearRect(0,0,Canvas.ctx().width,Canvas.ctx().height);
+        // Canvas.Rect(new Rect(0,0,500,500),'#ff00ff',true)
+
+        ptime = performance.now() - ptime;
+
+        ftimer.Add(deltaTime*1000);
+
+        Canvas.Text(60,ftimer.Get().toFixed(2),new Vector2(0,60),'#ffffff')
+
+        Canvas.Text(60,ltimer.Get().toFixed(2), new Vector2(0,120),'#ffffff')
+        Canvas.Text(60,rtimer.Get().toFixed(2), new Vector2(0,180),'#ffffff')
+
+        ptime = performance.now();
+
+
+        requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+
+
+
+</script>
+</html>

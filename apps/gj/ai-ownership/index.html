@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .container {
+            position: relative;
+        }
+
+        #text {
+            position: absolute;
+            background-color: transparent;
+            left: 0px;
+            top: 0px;
+            z-index: 10;
+        }
+    </style>
+
+
+    <meta charset="UTF-8">
+    <title>AI ownership</title>
+    <script src='https://git.io/glm-js.min.js'></script>
+    <script src="gazlib.js"></script>
+    <script src="basictypes.js"></script>
+    <script src="spawnpoint.js"></script>
+    <script src="obstacle.js"></script>
+    <script src="agent.js"></script>
+    <script src="routefinding.js"></script>
+    <script src="player.js"></script>
+    <script src="app.js"></script>
+    <script src="model.js"></script>
+    <script src="baddiemanager.js"></script>
+    <script src="baddie.js"></script>
+</head>
+
+<div class="container">
+    <canvas id="canvas"></canvas>
+</div>
+
+<body>
+<script>
+    document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+    document.body.scroll = "no"; // ie only
+    document.body.style.padding = 0;
+    document.body.style.margin = 0;
+
+    GameInst = new Game();
+    GameInst.Run();
+
+</script>
+</body>
+</html>
+
