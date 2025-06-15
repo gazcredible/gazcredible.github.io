@@ -9,17 +9,17 @@
 
 main:
 
-  - title: "Game Development"
-    url: /pub2/
+  #- title: "Game Development"
+  #  url: /pub2/
 
-  - title: "Water Research"
-    url: /water/
+  #- title: "Water Research"
+  #  url: /water/
 
-  - title: "Lecturing"
-    url: /teaching/
+  #- title: "Lecturing"
+  #  url: /teaching/
 
-  - title: "Blog Posts"
-    url: /year-archive/
+  #- title: "Blog Posts"
+  #  url: /year-archive/
     
   - title: "CV"
     url: /cv/

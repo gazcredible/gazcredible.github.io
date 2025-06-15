@@ -5,30 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="433c4042-bb64-4a94-9717-4b7909b9133f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/_pages/water.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_pub2/bf-game.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_pub2/bms-game.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_pub2/bs-game.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_pub2/gj-game.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_pub2/html5-game.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_pub2/lh-game.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_pub2/mm-game.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/favicon.ico" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/_config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/_data/navigation.yml" beforeDir="false" afterPath="$PROJECT_DIR$/_data/navigation.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/_pages/about.md" beforeDir="false" afterPath="$PROJECT_DIR$/_pages/about.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/_pages/cv.md" beforeDir="false" afterPath="$PROJECT_DIR$/_pages/cv.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_pages/pub2.html" beforeDir="false" afterPath="$PROJECT_DIR$/_pages/pub2.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_pub2/uz-game.md" beforeDir="false" afterPath="$PROJECT_DIR$/_pub2/1.uz-game.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_pub2/wod-game.md" beforeDir="false" afterPath="$PROJECT_DIR$/_pub2/2.wod-game.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_publications/aqua3s-research.md" beforeDir="false" afterPath="$PROJECT_DIR$/_water/aqua3s-research.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_publications/arsinoe-research.md" beforeDir="false" afterPath="$PROJECT_DIR$/_water/arsinoe-research.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_publications/f4w-research.md" beforeDir="false" afterPath="$PROJECT_DIR$/_water/f4w-research.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_publications/lotus-research.md" beforeDir="false" afterPath="$PROJECT_DIR$/_water/lotus-research.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_publications/natalie-research.md" beforeDir="false" afterPath="$PROJECT_DIR$/_water/natalie-research.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_publications/waterline-research.md" beforeDir="false" afterPath="$PROJECT_DIR$/_water/waterline-research.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_publications/waterverse-research.md" beforeDir="false" afterPath="$PROJECT_DIR$/_water/waterverse-research.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,22 +37,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "working-dev",
-    "last_opened_file_path": "/home/gareth/Documents/personal/gazcredible.github.io/_pub2",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;working-dev&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/gareth/Documents/personal/gazcredible.github.io/_pub2&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/_pub2" />
@@ -87,8 +68,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-PY-251.25410.159" />
-        <option value="bundled-python-sdk-e0ed3721d81e-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.159" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PY-251.26094.141" />
+        <option value="bundled-python-sdk-9f8e2b94138c-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26094.141" />
       </set>
     </attachedChunks>
   </component>
@@ -101,7 +82,10 @@
       <updated>1749306612765</updated>
       <workItem from="1749306613826" duration="4081000" />
       <workItem from="1749310705036" duration="345000" />
-      <workItem from="1749379665235" duration="5171000" />
+      <workItem from="1749379665235" duration="6117000" />
+      <workItem from="1749461902754" duration="33000" />
+      <workItem from="1749900661006" duration="1195000" />
+      <workItem from="1749983666346" duration="2100000" />
     </task>
     <servers />
   </component>
