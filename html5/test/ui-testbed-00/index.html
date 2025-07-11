@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        li {
+            float: left;
+        }
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        li a:hover:not(.active) {
+            background-color: #111;
+        }
+
+        .active {
+            background-color: #4CAF50;
+        }
+    </style>
+
+    <style>
+        html, body
+        {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+</head>
+<body>
+
+<ul id="menu">
+    <li><a href="#">Home</a> </li>
+    <li><a href="#">Map</a></li>
+    <li><a href="#">Alerts</a></li>
+    <li><a href="#">Webgl</a></li>
+    <li><a href="#">Sensors</a></li>
+</ul>
+
+<script>
+
+    document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+    document.body.scroll = "no"; // ie only
+    document.body.style.padding = 0;
+    document.body.style.margin = 0;
+
+
+    function getEventTarget(e)
+    {
+        e = e || window.event;
+        return e.target || e.srcElement;
+    }
+
+    let ul = document.getElementById('menu');
+
+    ul.onclick = function(event)
+    {
+        var target = getEventTarget(event);
+        setIFrame(target.innerHTML.toLowerCase());
+    }
+
+    function setIFrame(label)
+    {
+        if(label == "map")
+        {
+            newIframe.src = 'leaflet-map.html';
+        }
+
+        if(label == "alerts")
+        {
+            newIframe.src = 'alerts.html';
+        }
+
+        if(label == "home")
+        {
+            newIframe.src = 'home.html';
+        }
+
+        if(label == "webgl")
+        {
+            newIframe.src = 'glhome.html';
+        }
+
+        if(label == "sensors")
+        {
+            newIframe.src = 'sensors.html';
+        }
+
+    }
+
+
+    var newIframe = document.createElement('iframe');
+    newIframe.width = '100%';
+    newIframe.height = '95%';
+    newIframe.src = 'about:blank';
+    document.body.appendChild(newIframe);
+
+    newIframe.src = '';
+
+    setIFrame('map');
+
+</script>
+
+</body>
+</html>

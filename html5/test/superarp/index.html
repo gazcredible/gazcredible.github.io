@@ -1,0 +1,396 @@
+<script src="nexusUI.js"></script>
+<body>
+<input style="background:black; color:white; font-size:25pt" type="text" value="" id="freq_box">
+
+<br>
+<canvas id="tempo" nx="dial" min="30" max="180" label="tempo"></canvas>
+<canvas id="masterVol" nx="dial" min="0" max="1" label="Vol"></canvas>
+
+<canvas id="delayTime" nx="dial" min="0" max="1" label="Delay Time"></canvas>
+<canvas id="feedbackRate" nx="dial" min="0" max="1.0" label="FBRate"></canvas>
+
+<br>
+<canvas id="matrix1" nx="matrix" width="1000" height="400"></canvas>
+
+<br>
+<br>
+<canvas id="matrix2" nx="matrix" width="1000" height="300"></canvas>
+
+
+
+<script>
+
+    var start_freq = 200;
+
+    var current_freq = start_freq;
+
+    var freq_changes = [200];
+
+    var step = 0;
+
+    var interval = 1;
+    var osc2DetuneValue = 0;
+
+
+    var audio_context = window.AudioContext || window.webkitAudioContext;
+    var con = new audio_context();
+
+    var osc1 = con.createOscillator();
+    osc1.type = 'triangle';
+    osc1.frequency.value = start_freq;
+    var osc1_amp = con.createGain();
+    osc1_amp.gain.value = 0;
+    osc1.connect(osc1_amp);
+
+    var osc2 = con.createOscillator();
+    osc2.type = 'sawtooth';
+    osc2.frequency.value = start_freq;
+    var osc2_amp = con.createGain();
+    osc2_amp.gain.value = 0;
+    osc2.connect(osc2_amp);
+
+    var master_amp = con.createGain();
+    master_amp.gain.value = 0.5;
+
+    var del = con.createDelay();
+
+
+    osc1_amp.connect(del);
+    osc2_amp.connect(del);
+
+    var fb = con.createGain();
+    del.connect(fb);
+    fb.connect(del);
+    del.delayTime.value = 0.25;
+    fb.gain.value = 0.75;
+
+
+
+    del.connect(master_amp);
+
+    master_amp.connect(con.destination);
+
+    var drum_seq = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+
+
+
+
+
+    //WWHWWWH
+    var seq = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//B =+2   (11)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//A =+2  (9)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//G = +2 (7)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//F = +1 (5)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//E = +2 (4)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//D = +2 (2)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//C = 0
+
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//B =+2   (11)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//A =+2  (9)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//G = +2 (7)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//F = +1 (5)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//E = +2 (4)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//D = +2 (2)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//C = 0
+
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//B =+2   (11)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//A =+2  (9)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//G = +2 (7)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//F = +1 (5)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//E = +2 (4)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//D = +2 (2)
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],//C = 0
+    ];
+
+    var offsetToScaleDegree = [24+11,24+9,24+7,24+5,24+4,24+2,24+0, 12+11,12+9,12+7,12+5,12+4,12+2,12+0,  11,9,7,5,4,2,0];
+
+    var Voice	=	function()
+    {
+        this.osc1 = con.createOscillator();
+        this.osc1.type = 'triangle';
+        this.osc1.frequency.value = 0;
+
+        this.osc1_amp = con.createGain();
+        this.osc1_amp.gain.value = 0.0;
+        this.osc1.connect(this.osc1_amp);
+
+        this.osc1_amp.connect(del);
+
+        //this.osc1_amp.connect(con.destination);
+
+        this.osc1.start();
+
+        this.volume = 0;
+        this.state = false;
+    };
+
+    Voice.prototype	=
+        {
+            update:function(note)
+            {
+            }
+        };
+
+    var voices = [];
+
+    for(var i=0;i<seq.length;i++)
+    {
+        voices.push(new Voice());
+    }
+
+
+    var samplesLookup =  [ ["big room clap.wav", "CLAP"],
+        ["big room claves.wav", "CLAVES"],
+        ["big room closed hat.wav", "CLOSED HAT"],
+        ["big room crash.wav", "CRASH"],
+        ["big room fx.wav", "FX"],
+        ["big room hat.wav", "HAT"],
+        ["big room kick 1.wav", "KICK 1"],
+        ["big room kick 2.wav", "KICK 2"],
+        ["big room ride.wav", "RIDE"],
+        ["big room shaker.wav", "SHAKER"],
+        ["big room snare.wav", "SNARE"],
+        ["big room tom.wav", "TOM"],
+    ];
+
+    var sampleNames = ["CLAP",
+         "CLAVES",
+        "CLOSED HAT",
+        "HAT",
+        "CRASH",
+        "RIDE",
+        "FX",
+        "SHAKER",
+        "TOM",
+        "SNARE",
+        "KICK 2",
+        "KICK 1"];
+
+    function loadSample(url, name, callback){
+        var request = new XMLHttpRequest();
+        request.open('GET', url, true);
+        request.responseType = 'arraybuffer';
+        request.onload = function(){
+            var audioData = request.response;
+            con.decodeAudioData(audioData, function(buffer)
+            {
+                callback(buffer,name);
+            });
+        };
+        request.send();
+    }
+
+    var sampleMap = {};
+    var drum_amp = [];
+    function LoadTosampleMap(buffer,name)
+    {
+        sampleMap[name] =  buffer;
+    }
+
+    for(var i=0;i<samplesLookup.length;i++)
+    {
+        loadSample(samplesLookup[i][0],samplesLookup[i][1], LoadTosampleMap);
+
+        var amp = con.createGain();
+        amp.connect(master_amp);
+        drum_amp.push(amp);
+    }
+
+
+
+
+    var octave = 1;
+    function getFrequency(baseFreq, numSemitones)
+    {
+        return baseFreq * Math.pow(Math.pow(2, 1/12), numSemitones);
+    }
+
+    function changeNote(when)
+    {
+        matrix1.jumpToCol(step);
+        matrix2.jumpToCol(step);
+        step = (step +1) % seq[0].length;
+
+        for(var i=0;i<seq.length;i++)
+        {
+            if(seq[i][step]=='1')
+            {
+                voices[i].volume = 1;
+                voices[i].osc1.frequency.setValueAtTime(getFrequency(32.7,offsetToScaleDegree[i]+(octave*12)), when);
+                voices[i].state = true;
+            }
+            else
+            {
+                voices[i].state = false;
+                voices[i].volume = 0;
+            }
+        }
+
+        for(var i=0;i<drum_seq.length;i++)
+        {
+            if(drum_seq[i][step]=='1')
+            {
+                var player = con.createBufferSource();
+
+                player.buffer = sampleMap[sampleNames[i]];
+                player.loop = false;
+                player.connect(con.destination);
+                player.start(when);
+            }
+        }
+    }
+
+
+
+    //osc_amp.connect(con.destination);
+
+    osc1.start();
+    osc2.start();
+
+
+
+
+    // this code will wake up every (wait_time) ms
+    // and schedule a load of drum triggers on the clock
+    // each time, remembering where it scheduled to in the future
+    // so it does not repeat anything
+
+    var oldTime = con.currentTime;
+
+    var bpm = 60;
+    var beats_per_bar = 4;
+
+
+    var tempo;
+    var masterVol;
+    var delayTime;
+    var feedbackRate;
+    var matrix1;
+    var matrix2;
+
+    nx.onload = function()
+    {
+        tempo.val.value = bpm;
+        tempo.draw();
+        tempo.on('*', OnTempoChanged);
+
+        masterVol.val.value = master_amp.gain.value;
+        masterVol.draw();
+        masterVol.on('*', OnMasterVol);
+
+        delayTime.val.value = del.delayTime.value;
+        delayTime.draw();
+        delayTime.on('*', OnDelayTime);
+
+        feedbackRate.val.value = fb.gain.value;
+        feedbackRate.draw();
+        feedbackRate.on('*', OnFeedbackRate);
+
+        matrix1.col = seq[0].length;
+        matrix1.row = seq.length;
+        matrix1.bpm = bpm;
+        matrix1.init();
+        matrix1.sequencing = "true";
+
+        matrix1.on('*', function(data)
+        {
+            if (data.row !== undefined)
+            {
+                seq[data.row][data.col] = data.level;}
+        });
+
+        matrix2.col = drum_seq[0].length;
+
+        matrix2.row = drum_seq.length;
+        matrix2.bpm = bpm;
+        matrix2.init();
+        matrix2.sequencing = "true";
+
+        matrix2.on('*', function(data)
+        {
+            if (data.row !== undefined)
+            {
+                drum_seq[data.row][data.col] = data.level;
+            }
+        });
+    };
+
+    function OnFeedbackRate(data)
+    {
+        fb.gain.value = data.value;
+    }
+
+    function OnDelayTime(data)
+    {
+        del.delayTime.value = data.value;
+    }
+
+    function OnMasterVol(data)
+    {
+        master_amp.gain.value = data.value;
+    }
+    function OnOsc1Vol(data)
+    {
+        osc1_amp.gain.value = data.value;
+    }
+
+    function OnOsc2Vol(data)
+    {
+        osc2_amp.gain.value = data.value;
+    }
+
+    function Onosc2Detune(data)
+    {
+        osc2DetuneValue = data.value;
+    }
+
+    function OnTempoChanged(data){
+        // set frequency of audible oscillator
+        bpm = data.value;
+        matrix1.bpm = bpm;
+        matrix2.bpm = bpm;
+    }
+
+
+
+    setInterval(function()
+    {
+        var now = con.currentTime;
+        var gap = now - oldTime;
+
+        if (gap > (60 / (bpm * beats_per_bar)))
+        {
+            oldTime += gap;
+
+            changeNote(now);
+        }
+
+        for(var i=0;i<voices.length;i++)
+        {
+            if(voices[i].state === true) {
+                voices[i].osc1_amp.gain.value = voices[i].volume * master_amp.gain.value;
+            }
+            else
+            {
+                voices[i].osc1_amp.gain.value = 0;
+            }
+        }
+
+    }, 16);
+
+
+</script>
+</body>

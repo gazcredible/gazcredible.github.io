@@ -1,0 +1,109 @@
+main code
+acceptThread running
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('82.31.141.155', 50287)>
+new client
+clientReceive running
+client message
+client message
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('82.31.141.155', 50293)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('124.243.245.66', 45459)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53695)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53713)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53720)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53727)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53732)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53817)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53850)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53878)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53886)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53894)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53957)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53975)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 53993)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 54000)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 54032)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 54070)>
+new client
+clientReceive running
+client message
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 54104)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 54124)>
+new client
+clientReceive running
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 54133)>
+new client
+clientReceive running
+client message
+client message
+client message
+lost client
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 54161)>
+new client
+clientReceive running
+client message
+lost client
+<socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 54173)>
+new client
+clientReceive running
+<socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('46.101.56.200', 8222), raddr=('194.82.214.6', 54174)>
+new client
+clientReceive running
+client message
+client message

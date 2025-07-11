@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polyrhythm Machine</title>
+    <script src="gazlib.js"></script>
+
+    <script src="game/guibutton.js"></script>
+    <script src="game/guibuttontext.js"></script>
+    <script src="game/guidial.js"></script>
+    <script src="game/sequencer.js"></script>
+    <script src="game/drummachine.js"></script>
+
+    <!--https://fonts.google.com/-->
+    <link href='https://fonts.googleapis.com/css?family=Archivo Black' rel='stylesheet'>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+</body>
+</html>
+
+<script>
+    document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+    document.body.scroll = "no"; // ie only
+    document.body.style.padding = 0;
+    document.body.style.margin = 0;
+
+    drummachineInst.Run();
+</script>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Launcher</title>
+    <script src="launcher/lib/vector2.js"></script>
+    <script src="launcher/lib/vector3.js"></script>
+    <script src="launcher/lib/vector4.js"></script>
+    <script src="launcher/lib/matrix.js"></script>
+    <script src="launcher/lib/circularcollider.js"></script>
+    <script src="launcher/lib/rect.js"></script>
+    <script src="launcher/lib/size.js"></script>
+    <script src="launcher/lib/input_keycodes.js"></script>
+    <script src="launcher/lib/input.js"></script>
+    <script src="launcher/lib/canvas.js"></script>
+    <script src="launcher/lib/gazcanvas.js"></script>
+    <script src="launcher/lib/statemachine.js"></script>
+
+    <script src="launcher/game/gamestates.js"></script>
+    <script src="launcher/game/genericapp.js"></script>
+
+    <!--https://fonts.google.com/-->
+    <link href='https://fonts.googleapis.com/css?family=Archivo Black' rel='stylesheet'>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+</body>
+</html>
+
+<script>
+
+    document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+    document.body.scroll = "no"; // ie only
+    document.body.style.padding = 0;
+    document.body.style.margin = 0;
+
+    GenericApp.Run();
+</script>

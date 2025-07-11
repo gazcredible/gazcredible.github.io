@@ -1,27 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <title>Advent</title>
-    <script src="game.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 
-    <script src="game/gamestates.js"></script>
-    <script src="game/game.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <!--https://fonts.google.com/-->
-    <link href='https://fonts.googleapis.com/css?family=Archivo Black' rel='stylesheet'>
 </head>
 <body>
-<canvas id="canvas"></canvas>
-</body>
-</html>
-
 <script>
     document.documentElement.style.overflow = 'hidden';  // firefox, chrome
-    document.body.scroll = "no"; // ie only
-    document.body.style.padding = 0;
-    document.body.style.margin = 0;
 
-    GameInst.Run();
+    let newIframe = document.createElement('iframe');
+    newIframe.src = 'about:blank';
+    newIframe.style="position: absolute; width: 100%; height: 100%; border: none";
+
+    newIframe.src = '';
+
+    if(document.body !== null)
+    {
+        document.body.scroll = "no"; // ie only
+        document.body.style.padding = 0;
+        document.body.style.margin = 0;
+    }
+
+    let nav = document.createElement('nav');
+    nav.className="navbar navbar-expand-lg navbar-light bg-light";
+    document.body.appendChild(nav);
+
+    let content = {};
+    content['asteroids'] = "games/asteroids/index.html";
+    content['pacman'] = "games/pacman/index.html";
+    content['crappybird'] = "games/crappybird/index.html";
+    content['missilecommand'] = "games/missilecommand/index.html";
+    content['astgl'] = "games/astgl/index.html";
+    content['DTF'] = "test/dropthefruit/index.html";
+
+    content['advent'] = "advent/index.html";
+    content['808'] = "apps/drum machine/index.html";
+    content['fret'] = "apps/fretboard/index.html";
+    content['life'] = "apps/life/index.html";
+    content['polygen'] = "apps/polygen/index.html";
+    content['TT'] = "tinytown/index.html";
+
+
+    {
+        let a = document.createElement('a');
+        a.className="navbar-brand";
+        a.href="#";
+        a.innerHTML = "Home";
+        nav.appendChild(a);
+
+        let div = document.createElement('div');
+        nav.appendChild(div);
+        div.className="collapse navbar-collapse";
+        div.id="navbarNav";
+
+        let ul = document.createElement('ul');
+        ul.className="navbar-nav";
+        div.appendChild(ul);
+
+        for (const [key, value] of Object.entries(content))
+        {
+            let li = document.createElement('li');
+            li.className = "nav-item";
+            ul.appendChild(li);
+            a = document.createElement('a');
+            a.className = "nav-link";
+            a.href = "#";
+            a.onclick = function(){
+                newIframe.src = value;
+            };
+            a.innerHTML = key
+            li.appendChild(a)
+        }
+    }
+
+    document.body.appendChild(newIframe);
+
+
+
 </script>
+
+</body>
+</html>

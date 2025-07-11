@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>COMP330 Lecture 02: example 05 - Modular Synthesis</title>
+</head>
+<script src="nexusUI.js"></script>
+<body>
+<!--- Set up the NexusUI components in 5 rows
+1 - the knobs
+2 - the keyboard
+3&4 - the oscilator types
+5 - base octave
+
+All the nexusUI components use their ID in the definitions to link to objects in the update code,
+so the detune dial will be called from the detune object.
+-->
+
+<canvas id="detune" nx="dial" min="-12" max = "12" label="Osc2 Detune" width="200"></canvas>
+<canvas id="oscBlend" nx="dial" label="Osc Blend" width="200"></canvas>
+<canvas id="volume" nx="dial" label="Volume" width="200"></canvas>
+<br>
+<canvas id="kb" nx="keyboard"  width="750px"></canvas>
+
+<br>
+<h2>Osc1</h2>
+<canvas id="osc1Tabs" nx="tabs" width="500" height="50" label="osc1 type"></canvas>
+
+<br>
+<h2>Osc2</h2>
+<canvas id="osc2Tabs" nx="tabs" width="500" height="50" label="osc2 type"></canvas>
+
+
+<br>
+<h2>Base Octave</h2>
+<canvas id="octaveTabs" nx="tabs" width="500" height="50"/>
+
+</body>
+
+<script>
+    var kb;
+    var detune;
+    var volume;
+    var oscBlend;
+    var osc1Tabs;
+    var osc2Tabs;
+    var octaveTabs;
+
+    var oscOptions = ["sine", "square", "sawtooth","triangle"];
+
+
+    var octiveOptions = ["C1", "C2", "C3","C4","C5"];
+
+
+    //Define audio context, given the lack of standards in web development,
+    //the audio context is either AudioContext or webkitAudioContext.
+    //Only one type is available per system
+
+    var audio_context = new (window.AudioContext || window.webkitAudioContext)();
+
+    /*  Set-up the module map
+        There's two oscilators, osc1 & osc2. Each has their own amplifier which allows us to set their volumes relative
+        to each other. They both plug into the destination so we can hear them.
+
+        osc1 -> amp1 -|
+                      |-> destination
+        osc2 -> amp2 -|
+     */
+
+    var osc1 = audio_context.createOscillator();
+    var osc2 = audio_context.createOscillator();
+
+    osc1.type = oscOptions[0];
+    osc2.type = oscOptions[0];
+
+    var amp1 = audio_context.createGain();
+    var amp2 = audio_context.createGain();
+    amp1.gain.value = 1.0;
+    amp2.gain.value = 0.0;
+
+    var volumeValue=0.0;
+    var blendValue = 0.3;
+
+    var detuneValue= 1;
+    var octave = 1;
+
+    osc1.connect(amp1);
+    osc2.connect(amp2);
+
+    amp1.connect(audio_context.destination);
+    amp2.connect(audio_context.destination);
+
+    osc1.start();
+    osc2.start();
+
+    SetNote(0,0,0);
+
+
+    nx.onload = function()
+    {
+        /*  This function is called when nexus is started and will set up the initial values for the nexus components
+            as well as the callback functions
+
+            The application is event-driven rather than using setInterval, so events in NexusUI components will trigger
+            updates in the synth, namely notes being played on stopped in the keyboard (kb)
+
+         */
+        kb.on('*', kbChanged);
+        detune.on('*', detuneChanged);
+        volume.on('*', volumeChanged);
+        volumeValue = 0.5;
+        volume.val.value = volumeValue;
+        volume.draw();
+
+        oscBlend.on('*', oscBlendChanged);
+
+        osc1Tabs.on('*', osc1TabsChanged);
+        osc1Tabs.options = oscOptions;
+        osc1Tabs.choice = 0;
+        osc1Tabs.draw();
+        osc1.type = oscOptions[osc1Tabs.choice];
+
+
+        osc2Tabs.on('*', osc2TabsChanged);
+        osc2Tabs.options = oscOptions;
+        osc2Tabs.choice = 0;
+        osc2Tabs.draw();
+        osc2.type = oscOptions[osc2Tabs.choice];
+
+        octaveTabs.on('*',octaveTabsChanged);
+        octaveTabs.options = octiveOptions;
+        octaveTabs.choice = octave;
+        octaveTabs.draw();
+    };
+
+    /*  These are all the callback functions for the Nexus widgets
+        A lot of them will just push values into local variables that
+        are used when a new note is played
+     */
+    function SetNote(note,vol,oscblend)
+    {
+        //32.7Hz is C1
+        //octave is set to 3, so it's pushing all the notes up to start at C4
+        osc1.frequency.value = getFrequency(32.7,note+(octave*12));
+        osc2.frequency.value = getFrequency(32.7+detuneValue,note+(octave*12));
+
+        amp1.gain.value = (1.0-oscblend) *vol;
+        amp2.gain.value = oscblend * vol;
+    }
+
+    function getFrequency(baseFreq, numSemitones)
+    {
+        return baseFreq * Math.pow(Math.pow(2, 1/12), numSemitones);
+    }
+
+
+
+    function detuneChanged(data)
+    {
+        detuneValue = data.value;
+    }
+
+    function volumeChanged(data)
+    {
+        volumeValue = data.value;
+
+    }
+
+    function oscBlendChanged(data)
+    {
+        blendValue = data.value;
+
+    }
+
+    function kbChanged(data)
+    {
+        //work out offset from lowest not on the virtual keyboard which is 48
+        if(data.on > 0)
+        {
+            SetNote(data.note - 48,volumeValue,blendValue);
+        }
+        else
+        {
+            SetNote(data.note - 48,0,0);
+        }
+    }
+
+    function osc1TabsChanged(data)
+    {
+        osc1.type = oscOptions[data.index];
+    }
+
+    function osc2TabsChanged(data)
+    {
+        osc2.type = oscOptions[data.index];
+    }
+
+    function octaveTabsChanged(data)
+    {
+        octave = data.index;
+    }
+
+</script>

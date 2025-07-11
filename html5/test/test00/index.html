@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="vector3.js"></script>
+    <script src="vector4.js"></script>
+    <script src="matrix.js"></script>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+</body>
+
+<script>
+    "use strict";
+
+    function compileShader(gl, shaderSource, shaderType)
+    {
+        // Create the shader object
+        var shader = gl.createShader(shaderType);
+
+        // Set the shader source code.
+        gl.shaderSource(shader, shaderSource);
+
+        // Compile the shader
+        gl.compileShader(shader);
+
+        // Check if it compiled
+        var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+        if (!success) {
+            // Something went wrong during compilation; get the error
+            throw "could not compile shader:" + gl.getShaderInfoLog(shader);
+        }
+
+        return shader;
+    }
+
+    function createProgram(gl, vertexShader, fragmentShader) {
+        // create a program.
+        var program = gl.createProgram();
+
+        // attach the shaders.
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+
+        // link the program.
+        gl.linkProgram(program);
+
+        // Check if it linked.
+        var success = gl.getProgramParameter(program, gl.LINK_STATUS);
+        if (!success) {
+            // something went wrong with the link
+            throw ("program filed to link:" + gl.getProgramInfoLog (program));
+        }
+
+        return program;
+    };
+
+    // Get A WebGL context
+    /** @type {HTMLCanvasElement} */
+    var canvas = document.getElementById("canvas");
+    var gl = canvas.getContext("webgl");
+
+    // setup GLSL program
+    //var program = webglUtils.createProgramFromScripts(gl, ["2d-vertex-shader", "2d-fragment-shader"]);
+
+    var vsSource = `
+    attribute vec4 position;
+    uniform mat4 matrix;
+
+    void main()
+    {
+        gl_Position = matrix * position;
+    }
+    `;
+
+    var psSource = `
+    precision mediump float;
+    uniform vec4 color;
+
+    void main()
+    {
+        gl_FragColor = color;
+    }
+    `;
+
+    var vs = compileShader(gl,vsSource,gl.VERTEX_SHADER);
+    var ps = compileShader(gl,psSource,gl.FRAGMENT_SHADER);
+
+    var program = createProgram(gl,vs,ps);
+
+    // look up where the vertex data needs to go.
+    var positionLocation = gl.getAttribLocation(program, "position");
+
+    // lookup uniforms
+    var resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+    var colorLocation = gl.getUniformLocation(program, "color");
+    var matrixLoc = gl.getUniformLocation(program, "matrix");
+
+    // Create a buffer to put positions in
+    var positionBuffer = gl.createBuffer();
+
+    // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+    var translation = [0, 0];
+    var width = 100;
+    var height = 30;
+    var color = [Math.random(), Math.random(), Math.random(), 1];
+
+    function updatePosition(index)
+    {
+        return function(event, ui) {
+            translation[index] = ui.value;
+            drawScene();
+        }
+    }
+
+
+    var angle = 0;
+
+    requestAnimationFrame(drawScene);
+
+    // Draw the scene.
+    function drawScene(time) {
+        // Tell WebGL how to convert from clip space to pixels
+        gl.canvas.width = window.innerWidth-15;
+        gl.canvas.height = window.innerHeight-20;
+
+        //gl.canvas.width = 800;
+        //gl.canvas.height = 450;
+
+        //gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+        // Clear the canvas.
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clearColor(1,0,0,1);
+
+        // Tell it to use our program (pair of shaders)
+        gl.useProgram(program);
+
+        // Turn on the attribute
+        gl.enableVertexAttribArray(positionLocation);
+
+        // Bind the position buffer.
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+        // Setup a rectangle
+        //setRectangle(gl, translation[0], translation[1], width, height);
+        setRectangle(gl, -4,-1,-5, 8,2);
+
+        // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+        var size = 3;          // 2 components per iteration
+        var type = gl.FLOAT;   // the data is 32bit floats
+        var normalize = false; // don't normalize the data
+        var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+        var offset = 0;        // start at the beginning of the buffer
+
+        gl.vertexAttribPointer(positionLocation, size, type, normalize, stride, offset);
+
+        // set the color
+        gl.uniform4f(colorLocation, 0,1,1, 1);
+
+        var m = matrix.Multiply(matrix.CreateRotationZ(angle), matrix.CreatePerspectiveFieldOfView(0.5,gl.canvas.width/gl.canvas.height,1,5000.0) );
+        gl.uniformMatrix4fv(matrixLoc,false,m.m);
+
+        gl.disable(gl.CULL_FACE);
+        // Draw the rectangle.
+        var primitiveType = gl.TRIANGLES;
+        var offset = 0;
+        var count = 6;
+        gl.drawArrays(primitiveType, offset, count);
+
+        angle += 0.01;
+
+        requestAnimationFrame(drawScene);
+
+    }
+
+    // Fill the buffer with the values that define a rectangle.
+    function setRectangle(gl, x, y,z, width, height)
+    {
+        var x1 = x;
+        var x2 = x + width;
+        var y1 = y;
+        var y2 = y + height;
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array([
+                x1, y1,z,
+                x2, y1,z,
+                x1, y2,z,
+                x1, y2,z,
+                x2, y1,z,
+                x2, y2,z,
+            ]),
+            gl.STATIC_DRAW);
+    }
+
+
+</script>
+</html>
