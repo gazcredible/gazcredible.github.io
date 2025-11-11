@@ -1,18 +1,17 @@
 /*
-    file of classes related to muscial theory
- */
-Array.prototype.contains = function(obj)
-{
-    return this.indexOf(obj) > -1;
-};
-
-
-/*
     NoteLookup - support for octave class
  */
-class NoteLookup
+export class NoteLookup
 {
-    constructor(lowerNote, lowerName,lowerAltNote, upperNote, upperName, upperAltNote)
+    lowerNote;
+        lowerName;
+        lowerAltNote;
+
+        upperNote ;
+        upperName ;
+        upperAltNote;
+
+    constructor(lowerNote :any, lowerName:any,lowerAltNote:any, upperNote:any, upperName:any, upperAltNote:any)
     {
         this.lowerNote = lowerNote;
         this.lowerName = lowerName;
@@ -28,24 +27,26 @@ class NoteLookup
     Octave -    class to support building valid sequences (with appropriate note names)
                 sharps and flats are chosen depending on scale specifics
  */
-class Octave
+export class Octave
 {
+    notes = ["C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"];
+    sharpFlats = ["C#/Db", "D#/Eb", "F#/Gb", "G#/Ab", "A#/Bb"];
+    sharpLookup :{[id:string] : NoteLookup} = {};
+    sharpReverseLookup:{[id:string] : string} = {};
+
     constructor()
     {
         this.notes = ["C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"];
     
         this.sharpFlats = ["C#/Db", "D#/Eb", "F#/Gb", "G#/Ab", "A#/Bb"];
-    
-        this.sharpLookup = [];
-    
+
+        this.sharpLookup ={};
         this.sharpLookup["C#/Db"] = new NoteLookup("C", "C#", "Cb", "D", "Db", "D#");
         this.sharpLookup["D#/Eb"] = new NoteLookup("D", "D#", "Db", "E", "Eb", "E#");
         this.sharpLookup["F#/Gb"] = new NoteLookup("F", "F#", "Fb", "G", "Gb", "G#");
         this.sharpLookup["G#/Ab"] = new NoteLookup("G", "G#", "Gb", "A", "Ab", "A#");
         this.sharpLookup["A#/Bb"] = new NoteLookup("A", "A#", "Ab", "B", "Bb", "B#");
-    
-        this.sharpReverseLookup = [];
-    
+
         this.sharpReverseLookup["C#"] = "C#/Db";
         this.sharpReverseLookup["D#"] = "D#/Eb";
         this.sharpReverseLookup["F#"] = "F#/Gb";
@@ -59,38 +60,38 @@ class Octave
         this.sharpReverseLookup["Bb"] = "A#/Bb";
     }
     
-    isUnresolvedSharpOrFlat(note)
+    isUnresolvedSharpOrFlat(note :any)
     {
         return this.sharpLookup[note] !== null;
     }
     
-    isResolvedSharpOrFlat(note)
+    isResolvedSharpOrFlat(note :any)
     {
         return this.sharpReverseLookup[note] !== null;
     }
     
     
-    isSharpFlat(note)
+    isSharpFlat(note :any)
     {
         return this.sharpReverseLookup[note] !== undefined;
     }
     
-    isSharp(note)
+    isSharp(note :any)
     {
         return note.indexOf('#') !== -1;
     }
     
-    isFlat(note)
+    isFlat(note :any)
     {
         return note.indexOf('b') !== -1;
     }
     
-    noteToSharpFlat(note)
+    noteToSharpFlat(note :any)
     {
         return this.sharpReverseLookup[note];
     }
     
-    nextNote(currentNote, step)
+    nextNote(currentNote :any, step :any)
     {
         let offset = this.noteOffset(currentNote);
         
@@ -101,7 +102,7 @@ class Octave
         return this.notes[offset];
     }
     
-    stepAsOffset(step)
+    stepAsOffset(step :any)
     {
         if((step === "W") || (step === "2"))
         {
@@ -126,7 +127,7 @@ class Octave
         return 1;
     }
     
-    noteOffset(note)
+    noteOffset(note :any)
     {
         let actualNote = this.sharpReverseLookup[note];
         
@@ -146,7 +147,7 @@ class Octave
         return -1;
     }
     
-    isSharpOrFlat(note)
+    isSharpOrFlat(note :any)
     {
         for(let i=0;i<this.sharpFlats.length;i++)
         {
@@ -167,16 +168,19 @@ let referenceOctave = new Octave();
 /*
     MusicalString - a chromatic scale based on a guitar string starting at a given note and octave
  */
-class MusicalString 
+export class MusicalString
 {
-    constructor(rootNote, octave)
+    root:any;
+    octave:any;
+
+    constructor(rootNote :any, octave :any)
     {
         this.root = rootNote;
         this.octave = octave;
     }
-    getNotesWithOctave(scale, fretLength)
+    getNotesWithOctave(scale:any, fretLength?:any)
     {
-        let list = [];
+        let list:any[] = [];
         
         let currentNote = this.root;
         let currentOctave = this.octave;
@@ -197,7 +201,7 @@ class MusicalString
         return list;
     }
     
-    getNoteFromPosition(index)
+    getNoteFromPosition(index:any)
     {
         if(index === 0)
         {
@@ -215,9 +219,9 @@ class MusicalString
     }
     
     
-    getNotes(scale, fretLength)
+    getNotes(scale:any, fretLength:any)
     {
-        let list = [];
+        let list:any = [];
         
         let currentNote = this.root;
         
@@ -231,7 +235,7 @@ class MusicalString
         return list;
     }
     
-    getScalePositions(scale, fretLength)
+    getScalePositions(scale:any, fretLength:any)
     {
         let list = [];
         
@@ -245,7 +249,7 @@ class MusicalString
         return list;
     }
     
-    getScaleWithOctave(scale, fretLength)
+    getScaleWithOctave(scale:any, fretLength:any)
     {
         let list = [];
         
@@ -267,7 +271,7 @@ class MusicalString
             
             currentNote = referenceOctave.nextNote(currentNote,"H");
             
-            if(currentNote === "C")
+            if(currentNote === scale[0])
             {
                 currentOctave++;
             }
@@ -275,29 +279,11 @@ class MusicalString
         return list;
     }
     
-    toString(scale)
-    {
-        let notes = this.getNotes(scale);
-        
-        let str = "";
-        
-        for(let i = 0; i < notes.length;i++)
-        {
-            str += notes[i];
-            
-            let spaces = 7 - notes[i].length;
-            
-            for(let j=0;j<spaces;j++)
-            {
-                str += " ";
-            }
-        }
-        return str;
-    }
+
     
     
     
-    addNote(scale, str, note)
+    addNote(scale:any, str:[any], note:any)
     {
         let noteToPrint = note;
         
@@ -311,10 +297,8 @@ class MusicalString
         }
     }
     
-    addNoteAndOctave(scale, str, note, octave)
+    addNoteAndOctave(scale:any, str:any[], note:any, octave:any)
     {
-        let noteToPrint = note;
-        
         if(scale.containsNote(note) === false)
         {
             str.push(" ");
@@ -329,9 +313,12 @@ class MusicalString
 /*
     KeyScale - a scale in a given key, based on a scale definition and a root note
  */
-class KeyScale
+export class KeyScale
 {
-    constructor(scale, notes)
+    notes:any;
+    actualScale:any;
+
+    constructor(scale:any, notes:any)
     {
         this.notes = notes;
         this.actualScale = [];
@@ -374,35 +361,17 @@ class KeyScale
         {
             for(let i=0;i<this.notes.length;i++)
             {
-                if ((this.actualScale.length > 0) && (referenceOctave.isSharpOrFlat(this.notes[i]) === true))
-                {
-                    let noteOptions = referenceOctave.sharpLookup[this.notes[i]];
-                    
-                    if ((this.actualScale.contains(noteOptions.lowerNote) === true)
-                        || (this.actualScale.contains(noteOptions.lowerAltNote) === true)
-                    )
-                    {
-                        this.actualScale.push(noteOptions.upperName);
-                    }
-                    else
-                    {
-                        this.actualScale.push(noteOptions.lowerName);
-                    }
-                }
-                else
-                {
-                    this.actualScale.push(this.notes[i]);
-                }
+                this.actualScale.push(this.notes[i]);
             }
         }
     }
 
-    isScaleRoot(note)
+    isScaleRoot(note:any)
     {
         return this.notes[0] === note;
     }
     
-    containsNote(note)
+    containsNote(note:any)
     {
         if(referenceOctave.isSharpOrFlat(note) === true)
         {
@@ -432,7 +401,7 @@ class KeyScale
         return this.actualScale;
     }
     
-    getActualNote(note)
+    getActualNote(note:any)
     {
         if(referenceOctave.isSharpFlat(this.notes[0]) === true)
         {
@@ -455,7 +424,7 @@ class KeyScale
         return "ERROR";
     }
     
-    getNoteAsStep(note)
+    getNoteAsStep(note:any)
     {
         for(let i=0;i<this.notes.length;i++)
         {
@@ -481,9 +450,14 @@ class KeyScale
     
     Will build a KeyScale from a sequence of steps & half-steps (WWHWWWH etc) using a set of validNotes (chromatic scalse)
  */
-class ScaleDefinition
+export class ScaleDefinition
 {
-    constructor(label, stepSequence, validNotes, isBlues=false)
+    label :any;
+    step :any;
+    validNotes :any;
+    isBlues:any;
+
+    constructor(label:any, stepSequence:any, validNotes:any, isBlues=false)
     {
         this.label = label;
         this.step = stepSequence;
@@ -496,7 +470,7 @@ class ScaleDefinition
         return this.label;
     }
     
-    getScale(root)
+    getScale(root:any)
     {
         
         let scale = [];
@@ -517,9 +491,11 @@ class ScaleDefinition
         return new KeyScale(this,scale);
     }
     
-    hasKey(key)
+    hasKey(key:any)
     {
-        return this.validNotes.contains(key);
+        let index = this.validNotes.indexOf(key);
+
+        return index > -1;
     }
 }
 

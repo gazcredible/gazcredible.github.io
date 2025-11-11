@@ -6,11 +6,18 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "npm run dev"
   },
   "devDependencies": {
     "typescript": "~5.9.3",
-    "vite": "^7.2.2",
-    "gazlib": "1.0.4"
+    "vite": "^7.1.7",
+
+    "gaztastic-webapp": "^0.0.1",
+
+    "axios": "^1.11.0",
+    "jquery": "^3.7.1",
+    "highcharts": "^12.3.0",
+    "mapbox-gl": "^3.14.0"
   }
 }

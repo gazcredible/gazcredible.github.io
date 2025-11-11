@@ -1,7 +1,5 @@
-/*
-    ButtonBase - base button class
- */
-import {GAZCanvas, Rect,Vector2} from 'gazlib/src/gazlib.ts';
+import { Rect, Vector2 } from "./gazlib/maths.ts";
+import type {Fretboard} from "./fretboard.ts";
 
 class ButtonBase extends Rect
 {
@@ -34,31 +32,31 @@ class ButtonBase extends Rect
     
     }
     
-    draw()
+    draw(app:Fretboard)
     {
         //let rect = toScreenSpace(this.rect);
         
-        let fontSize = GAZCanvas.toScreenSpace(new Rect(0,0,24,24) ).h;
+        let fontSize = app.canvas.toScreenSpace(new Rect(0,0,24,24) ).h;
         
         if(this.active === false)
         {
-            GAZCanvas.Rect(this, 'rgb(255,127,127)') ;
+            app.canvas.Rect(this, 'rgb(255,127,127)') ;
         }
         else
         {
             if(this.selected === true)
             {
-                GAZCanvas.Rect(this, 'rgb(127,127,255)');
+                app.canvas.Rect(this, 'rgb(127,127,255)');
             }
             else
             {
-                if (this.isInMe(Input.mouseLogicalPos) === true)
+                if (this.isInMe(app.input.mouseLogicalPos) === true)
                 {
-                    GAZCanvas.Rect(this, 'rgb(0,255,255)');
+                    app.canvas.Rect(this, 'rgb(0,255,255)');
                 }
                 else
                 {
-                    GAZCanvas.Rect(this, 'rgb(0,255,0)');
+                    app.canvas.Rect(this, 'rgb(0,255,0)');
                 }
             }
         }
@@ -66,7 +64,7 @@ class ButtonBase extends Rect
         
         let pos = this.getCentre();
         
-        GAZCanvas.Text(24,this.label(), pos,"#ffffff",'center','Noto Sans');
+        app.canvas.Text(24,this.label(), pos,"#ffffff",'center','Noto Sans');
     }
 }
 
@@ -77,8 +75,10 @@ class ButtonBase extends Rect
 /*
     KeyButton - button for handling musical key
  */
-class KeyButton extends ButtonBase
+export class KeyButton extends ButtonBase
 {
+    labelText;
+
     constructor(label,rect)
     {
         super(rect);
@@ -100,8 +100,10 @@ class KeyButton extends ButtonBase
                     This may be better served by putting all the mode information into the fretboard class (or mode db)
                     and having the button just set the name of the current mode.
  */
-class ModeButton extends ButtonBase
+export class ModeButton extends ButtonBase
 {
+    mode;
+
     constructor(mode,rect)
     {
         super(rect);

@@ -1,16 +1,30 @@
+import { GameBase, StateMachineState } from "./gazlib/GameBase.ts";
+import {Size,Rect,Vector2} from "./gazlib/maths.ts";
 
-/*
-    Fretboard - main app class for the fretboard app
- */
-class Fretboard
+import {MusicalString, ScaleDefinition} from "./theory.ts";
+import {KeyButton,ModeButton} from "./button.ts";
+import {KeyState} from "./gazlib/keystate.ts";
+import {GameState_Test} from "./appstates.ts";
+
+import guitar_img from "./assets/bg.png";
+
+export class Fretboard extends GameBase
 {
     strings = [];
     keyButtons = [];
     modeButtons = [];
     image;
+    mode;
+    currentTonic;
+    currentScale;
+    displayID = 0;
+
+
+    displayButtons = [];
 
     constructor()
     {
+        super();
         //my guitar as a list of strings
         this.strings = [];
         
@@ -26,7 +40,7 @@ class Fretboard
     
     oneTimeInit()
     {
-        GAZCanvas.referenceScreenSize = new Size(1600,900);
+        this.canvas.referenceScreenSize = new Size(1600,900);
     
         //add musical strings with base note and octave
         this.strings.push( new MusicalString("E",2));
@@ -102,7 +116,6 @@ class Fretboard
         newItemID = 0;
         this.keyButtons[newItemID].selected = true;
         this.currentTonic =this.keyButtons[newItemID].labelText;
-    
         this.currentScale  = this.mode.getScale(this.currentTonic);
     
         {
@@ -118,7 +131,10 @@ class Fretboard
         }
     
         //load the guitar neck gfx
-        this.image.src = "assets/bg.png";
+        this.image.src = guitar_img;
+
+        this.stateMachine.addState(GameState_Test.label(), new GameState_Test(this));
+        this.stateMachine.setState(GameState_Test.label());
     }
     
     update()
@@ -132,9 +148,9 @@ class Fretboard
                 {
                     this.displayButtons[i].update();
                 
-                    if (Input.currentMouseState === INPUT_PRESSED)
+                    if (this.input.currentMouseState === KeyState.INPUT_PRESSED)
                     {
-                        if (this.displayButtons[i].isInRect(Input.mouseLogicalPos) === true)
+                        if (this.displayButtons[i].isInRect(this.input.mouseLogicalPos) === true)
                         {
                             newItemID = i;
                         }
@@ -166,9 +182,9 @@ class Fretboard
                 {
                     this.keyButtons[i].update();
                 
-                    if (Input.currentMouseState === INPUT_PRESSED)
+                    if (this.input.currentMouseState === KeyState.INPUT_PRESSED)
                     {
-                        if (this.keyButtons[i].isInRect(Input.mouseLogicalPos) === true)
+                        if (this.keyButtons[i].isInRect(this.input.mouseLogicalPos) === true)
                         {
                             this.currentTonic = this.keyButtons[i].labelText;
                             newItemID = i;
@@ -196,9 +212,9 @@ class Fretboard
             {
                 this.modeButtons[i].update();
             
-                if (Input.currentMouseState === INPUT_PRESSED)
+                if (this.input.currentMouseState === KeyState.INPUT_PRESSED)
                 {
-                    if (this.modeButtons[i].isInRect(Input.mouseLogicalPos) === true)
+                    if (this.modeButtons[i].isInRect(this.input.mouseLogicalPos) === true)
                     {
                         this.mode = this.modeButtons[i].mode;
                     
@@ -237,12 +253,12 @@ class Fretboard
     
     draw()
     {
-        GAZCanvas.Rect( new Rect(0,0,1600,900), 'rgb(255,0,0)');
+        this.canvas.Rect( new Rect(0,0,1600,900), 'rgb(255,0,0)');
         
-        GAZCanvas.Text(48,"Mode Notes", new Vector2(30,320),"#ffffff",'left','Noto Sans','Bold');
-        GAZCanvas.Text(48,this.currentScale.toString(), new Vector2(30,370),"#ffffff",'left','Noto Sans','Bold');
+        this.canvas.Text(48,"Mode Notes", new Vector2(30,320),"#ffffff",'left','Noto Sans','Bold');
+        this.canvas.Text(48,this.currentScale.toString(), new Vector2(30,370),"#ffffff",'left','Noto Sans','Bold');
     
-        let fretlength = 14;
+        let fretlength = 15;
         let yspace = 66;
         let fontSize = 36;
         let yStart = 520;
@@ -257,7 +273,7 @@ class Fretboard
         let yoffsets = [4,58,112,166,219,272];
         let zeroYOffsets =[10,5,2,-2,-5,-10];
         
-        GAZCanvas.Sprite(this.image,new Rect(0,500, 1600,400));
+        this.canvas.Sprite(this.image,new Rect(0,500, 1600,400));
         
         /*
             go through each string and draw in the valid notes
@@ -316,7 +332,7 @@ class Fretboard
                     if(currentString[fret] !== ' ')
                     {
                         //only draw the frets that aren't empty
-                        GAZCanvas.Text(fontSize, currentString[fret], pos, col, 'center', 'Noto Sans', "Bold");
+                        this.canvas.Text(fontSize, currentString[fret], pos, col, 'center', 'Noto Sans', "Bold");
                     }
                 }
             }
@@ -325,50 +341,31 @@ class Fretboard
         //draw all the buttons
         for(let i=0;i< this.displayButtons.length;i++)
         {
-            this.displayButtons[i].draw();
+            this.displayButtons[i].draw(this);
         }
     
     
         for(let i=0; i< this.keyButtons.length; i++)
         {
-            this.keyButtons[i].draw();
+            this.keyButtons[i].draw(this);
         }
     
         for(let i=0;i< this.modeButtons.length;i++)
         {
-            this.modeButtons[i].draw();
+            this.modeButtons[i].draw(this);
         }
     
-        //draw the mouse pointer so I can see what's going on, if the mouse is in the GAZCanvas space
-        //the mouse pos will be undefined if it's out of the GAZCanvas
-        if(Input.mouseLogicalPos !== undefined)
+        //draw the mouse pointer so I can see what's going on, if the mouse is in the this.canvas space
+        //the mouse pos will be undefined if it's out of the this.canvas
+        if(this.input.mouseLogicalPos !== undefined)
         {
             let modelRect = new Rect();
-            modelRect.set(Input.mouseLogicalPos.x,Input.mouseLogicalPos.y,10,10);
+            modelRect.set(this.input.mouseLogicalPos.x,this.input.mouseLogicalPos.y,10,10);
     
-            GAZCanvas.Rect(modelRect,'rgb(0,0,255');
+            this.canvas.Rect(modelRect,'rgb(0,0,255');
         }
-    }
-    
-    //Launch point for application
-    Run()
-    {
-        fretbaordInst.oneTimeInit();
-        setInterval(function()
-        {
-            GAZCanvas.update(60);
-            
-            Input.update();
-            
-            let letterboxColour = 'rgb(32,32,32)';
-            Canvas.Rect(new Rect(0, 0, window.innerWidth, window.innerHeight),letterboxColour);
-    
-            fretbaordInst.update();
-            fretbaordInst.draw();
-            
-            GAZCanvas.drawLetterbox(letterboxColour);
-        },17);
     }
 }
 
-fretbaordInst = new Fretboard();
+let app = new Fretboard();
+app.Run();
