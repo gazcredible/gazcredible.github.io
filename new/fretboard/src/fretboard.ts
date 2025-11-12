@@ -6,7 +6,7 @@ import {KeyButton,ModeButton} from "./button.ts";
 import {KeyState} from "./gazlib/keystate.ts";
 import {GameState_Test} from "./appstates.ts";
 
-import guitar_img from "./bg.png";
+import guitar_img from "./bg.png?inline";
 
 export class Fretboard extends GameBase
 {
