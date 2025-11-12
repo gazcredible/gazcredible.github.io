@@ -6,7 +6,7 @@ import {KeyButton,ModeButton} from "./button.ts";
 import {KeyState} from "./gazlib/keystate.ts";
 import {GameState_Test} from "./appstates.ts";
 
-import guitar_img from "./assets/bg.png";
+import guitar_img from "./bg.png";
 
 export class Fretboard extends GameBase
 {
@@ -366,6 +366,11 @@ export class Fretboard extends GameBase
         }
     }
 }
+
+document.documentElement.style.overflow = "hidden";  // firefox, chrome
+document.body.style.padding = "0";
+document.body.style.margin = "0";
+
 
 let app = new Fretboard();
 app.Run();
